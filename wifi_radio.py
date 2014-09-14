@@ -62,14 +62,14 @@ class WifiRadio(object):
   def printNextStation(self):    
     self.lcd.clear()
     self.lcd.writeMessageToLine(">> Next station >>",2,2)
-    sleep(1)
-    self.printWelcomeScreen()
+    sleep(0.5)
+    self.lcd.writeMessageToLine(self.mpc.getName(),2,2)
 
   def printPreviousStation(self):
     self.lcd.clear()
     self.lcd.writeMessageToLine("<< Prev. station <<",2,2)
-    sleep(1)
-    self.printWelcomeScreen()
+    sleep(0.5)
+    self.lcd.writeMessageToLine(self.mpc.getName(),2,2)
 
   def printWelcomeScreen(self):
     self.lcd.clear()

@@ -8,27 +8,26 @@
 # Date   : 14.09.2014
 #
 # Based on code from the following resources:
-from subprocess import call
+import subprocess
 
 class MusicPlayerControl(object):
 
   currentStation = 1
   numberOfStations = 0
 
+  def __init__(self, quiet=False):
+    self.quiet = quiet
+
   def clearPlaylist(self):
-    print "Clear playlist"
-    self.runCmd("mpc clear")
+    self.runCmd(["mpc", "clear"])
 
   def addStream(self, url):
-    print "Add stream: " + url
-    self.runCmd("mpc add " + url)
+    self.runCmd(["mpc", "add", url])
 
   def play(self, entry=1):    
-    print "Play entry " + str(entry)
-    self.runCmd("mpc play " + str(entry))
+    self.runCmd(["mpc", "play", str(entry)])
 
   def playNextStation(self):
-    print "Play next station"
     if(self.currentStation+1 > self.numberOfStations):
       self.currentStation = 1
     else:
@@ -36,29 +35,37 @@ class MusicPlayerControl(object):
     self.play(self.currentStation)
 
   def playPreviousStation(self):
-    print "Play previous station"
     if(self.currentStation -1 < 1):
       self.currentStation = self.numberOfStations
     else:
       self.currentStation -=1
     self.play(self.currentStation)
 
+  def getName(self):
+    result = self.runCmd(["mpc", "-f", "%name%"])
+    new_line_idx = result.index('\n')
+    return result[:new_line_idx]
+
+
   def stop(self):
-    print "Stop"
-    self.runCmd("mpc stop")
+    self.runCmd(["mpc", "stop"])
 
   def runCmd(self, cmd):
-    returncode = call(cmd, shell=True)
+    if(self.quiet):
+       cmd.insert(1,"-q")
 
-    if(returncode != 0):
-        print "error on command"
+    result = subprocess.Popen(cmd,stdout=subprocess.PIPE)
+    out, err = result.communicate()
+    return out
+
+
+    
 
   def loadPlaylist(self, path):
-    print "Load playlist"
     self.numberOfStations = 0
     f = open(path, 'r')
     for line in f:
-      self.addStream(line)
+      self.addStream(line.rstrip())
       self.numberOfStations += 1
     f.close()
 
