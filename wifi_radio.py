@@ -14,12 +14,14 @@
 
 import RPi.GPIO as GPIO
 import time
+from lcd import CharLCD
+from mpc import MusicPlayerControl
 
 class WifiRadio(object):
 
   # GPIO input pins for the back and forth buttons 
   BUTTON_BACK = 17
-  BUTTON_FORTH = 27
+  BUTTON_FORWARD = 27
 
   # GPIO output pins for the LCD mapping
   LCD_RS = 7
@@ -31,146 +33,83 @@ class WifiRadio(object):
   LED_ON = 15
 
   def __init__(self):
-    lcd = CharLCD()
+    self.gpioInit()
+    self.lcd = CharLCD( pin_rs=self.LCD_RS,
+                   pin_e=self.LCD_E,
+                   pin_d4=self.LCD_D4,
+                   pin_d5=self.LCD_D5,
+                   pin_d6=self.LCD_D6,
+                   pin_d7=self.LCD_D7)
 
-  def main():
+    self.mpc = MusicPlayerControl()
+    self.mpc.clearPlaylist()
+    self.mpc.loadPlaylist("playlist.m3u")
+    self.mpc.play()
 
-  init()
+    self.printWelcomeScreen()
+    
+    # main loop
+    while True:
+      btn_input = self.readButtonInputs()
+      if(btn_input == 1):
+        self.lcd.writeMessageToLine(">> Next station >>",2,2)
+        self.mpc.playNextStation()
+      elif(btn_input ==2):
+        self.lcd.writeMessageToLine("<< Previous station <<",2,2)
+        self.mpc.playPreviousStation()
+      
+  def printWelcomeScreen(self):
+    self.lcd.clear()
+    self.lcd.writeMessageToLine("====================",1,2)
+    self.lcd.writeMessageToLine("=   Raspberry PI   =",2,2)
+    self.lcd.writeMessageToLine("=    Wifi Radio    =",3,2)
+    self.lcd.writeMessageToLine("====================",4,2)
 
-  # main loop
-  while True:
-    btn_input = readButtonInputs()
-        
+  def printErrorMessage(self, error):
+    self.lcd.clear()
+    self.lcd.writeMessageToLine("An error occured.",2,2)
+    self.lcd.writeMessageToLine(error,3,2)
+    
+  def gpioInit(self):
+    GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BCM)
+
+    #set GPIO 0 as input
+    GPIO.setup(self.BUTTON_BACK, GPIO.IN)
+
+    #set GPIO 2 as input
+    GPIO.setup(self.BUTTON_FORWARD, GPIO.IN)
+
+  def readButtonInputs(self):  
   
-def init():
-  gpio_init()
-  lcd_init()
+    # Initialize  
+    got_prev = False  
+    got_next = False  
 
-def gpio_init():
-  GPIO.setwarnings(False)
-  GPIO.setmode(GPIO.BCM)
+    # Read switches  
+    sw1_prev = not GPIO.input(self.BUTTON_BACK)  
+    sw2_next = not GPIO.input(self.BUTTON_FORWARD)  
 
-  GPIO.setup(LCD_E, GPIO.OUT)  # E
-  GPIO.setup(LCD_RS, GPIO.OUT) # RS
-  GPIO.setup(LCD_D4, GPIO.OUT) # DB4
-  GPIO.setup(LCD_D5, GPIO.OUT) # DB5
-  GPIO.setup(LCD_D6, GPIO.OUT) # DB6
-  GPIO.setup(LCD_D7, GPIO.OUT) # DB7
+    # Debounce switches and look for two-button combo  
+    while(sw1_prev or sw2_next):  
 
-  #set GPIO 0 as input
-  GPIO.setup(GPIO0, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+      if(sw1_prev):  
+        got_prev = True  
 
-  #set GPIO 2 as input
-  GPIO.setup(GPIO2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+      if(sw2_next):  
+        got_next = True  
 
-def lcd_init():
-  # Initialise display
-  lcd_byte(0x33,LCD_CMD)
-  lcd_byte(0x32,LCD_CMD)
-  lcd_byte(0x28,LCD_CMD)
-  lcd_byte(0x0C,LCD_CMD)  
-  lcd_byte(0x06,LCD_CMD)
-  lcd_byte(0x01,LCD_CMD)  
+      time.sleep(0.001)
+      sw1_prev = not GPIO.input(self.BUTTON_BACK)  
+      sw2_next = not GPIO.input(self.BUTTON_FORWARD)  
 
-def lcd_string(message,style):
-  # Send string to display
-  # style=1 Left justified
-  # style=2 Centred
-  # style=3 Right justified
-
-  if style==1:
-    message = message.ljust(LCD_WIDTH," ")  
-  elif style==2:
-    message = message.center(LCD_WIDTH," ")
-  elif style==3:
-    message = message.rjust(LCD_WIDTH," ")
-
-  for i in range(LCD_WIDTH):
-    lcd_byte(ord(message[i]),LCD_CHR)
-
-def lcd_byte(bits, mode):
-  # Send byte to data pins
-  # bits = data
-  # mode = True  for character
-  #        False for command
-
-  GPIO.output(LCD_RS, mode) # RS
-
-  # High bits
-  GPIO.output(LCD_D4, False)
-  GPIO.output(LCD_D5, False)
-  GPIO.output(LCD_D6, False)
-  GPIO.output(LCD_D7, False)
-  if bits&0x10==0x10:
-    GPIO.output(LCD_D4, True)
-  if bits&0x20==0x20:
-    GPIO.output(LCD_D5, True)
-  if bits&0x40==0x40:
-    GPIO.output(LCD_D6, True)
-  if bits&0x80==0x80:
-    GPIO.output(LCD_D7, True)
-
-  # Toggle 'Enable' pin
-  time.sleep(E_DELAY)    
-  GPIO.output(LCD_E, True)  
-  time.sleep(E_PULSE)
-  GPIO.output(LCD_E, False)  
-  time.sleep(E_DELAY)      
-
-  # Low bits
-  GPIO.output(LCD_D4, False)
-  GPIO.output(LCD_D5, False)
-  GPIO.output(LCD_D6, False)
-  GPIO.output(LCD_D7, False)
-  if bits&0x01==0x01:
-    GPIO.output(LCD_D4, True)
-  if bits&0x02==0x02:
-    GPIO.output(LCD_D5, True)
-  if bits&0x04==0x04:
-    GPIO.output(LCD_D6, True)
-  if bits&0x08==0x08:
-    GPIO.output(LCD_D7, True)
-
-  # Toggle 'Enable' pin
-  time.sleep(E_DELAY)    
-  GPIO.output(LCD_E, True)  
-  time.sleep(E_PULSE)
-  GPIO.output(LCD_E, False)  
-  time.sleep(E_DELAY)   
-
-def readButtonInputs():  
-  
-  # Initialize  
-  got_prev = False  
-  got_next = False  
-
-  # Read switches  
-  sw1_prev = not GPIO.input(GPIO0)  
-  sw2_next = not GPIO.input(GPIO2)  
-
-  # Debounce switches and look for two-button combo  
-  while(sw1_prev or sw2_next):  
-
-    if(sw1_prev):  
-      got_prev = True  
-
-    if(sw2_next):  
-      got_next = True  
-
-    time.sleep(0.001)
-    sw1_prev = not GPIO.input(GPIO0)  
-    sw2_next = not GPIO.input(GPIO2)  
-
-  if(got_prev and got_next):  
-    print "both buttons pressed"
-    return 3  
-  if(got_next):
-    print "next button pressed"  
-    return 2  
-  if(got_prev):  
-    print "prev button pressed"
-    return 1  
-  return 0  
+    if(got_prev and got_next):  
+      return 3  
+    if(got_next):
+      return 2  
+    if(got_prev):  
+      return 1  
+    return 0  
 
 if __name__ == '__main__':
-  main()
+  radio = WifiRadio()
