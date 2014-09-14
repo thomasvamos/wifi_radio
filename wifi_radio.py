@@ -13,7 +13,7 @@
 #
 
 import RPi.GPIO as GPIO
-import time
+from time import sleep
 from lcd import CharLCD
 from mpc import MusicPlayerControl
 
@@ -52,12 +52,25 @@ class WifiRadio(object):
     while True:
       btn_input = self.readButtonInputs()
       if(btn_input == 1):
-        self.lcd.writeMessageToLine(">> Next station >>",2,2)
         self.mpc.playNextStation()
+        self.printNextStation()
       elif(btn_input ==2):
-        self.lcd.writeMessageToLine("<< Previous station <<",2,2)
         self.mpc.playPreviousStation()
-      
+        self.printPreviousStation()
+        
+        
+  def printNextStation(self):    
+    self.lcd.clear()
+    self.lcd.writeMessageToLine(">> Next station >>",2,2)
+    sleep(1)
+    self.printWelcomeScreen()
+
+  def printPreviousStation(self):
+    self.lcd.clear()
+    self.lcd.writeMessageToLine("<< Prev. station <<",2,2)
+    sleep(1)
+    self.printWelcomeScreen()
+
   def printWelcomeScreen(self):
     self.lcd.clear()
     self.lcd.writeMessageToLine("====================",1,2)
@@ -99,7 +112,7 @@ class WifiRadio(object):
       if(sw2_next):  
         got_next = True  
 
-      time.sleep(0.001)
+      sleep(0.001)
       sw1_prev = not GPIO.input(self.BUTTON_BACK)  
       sw2_next = not GPIO.input(self.BUTTON_FORWARD)  
 
