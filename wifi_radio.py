@@ -10,11 +10,11 @@
 # Based on code from the following resources:
 # Matt Hawkins: http://www.raspberrypi-spy.co.uk/2012/08/20x4-lcd-module-control-using-python/
 # http://usualpanic.com/2013/05/raspberry-pi-internet-radio/
-#
 
 import RPi.GPIO as GPIO
 from time import sleep
 from lcd import CharLCD
+from lcd_print_util import LCDPrintUtil
 from mpc import MusicPlayerControl
 
 class WifiRadio(object):
@@ -42,47 +42,31 @@ class WifiRadio(object):
                    pin_d7=self.LCD_D7)
 
     self.mpc = MusicPlayerControl()
+
+    self.lcdPrintUtil = LCDPrintUtil(self.lcd, self.mpc, nameShiftEnabled=True)
+
+    self.lcdPrintUtil.printWelcomeScreen()
+
+    self.mpc.stop()
     self.mpc.clearPlaylist()
     self.mpc.loadPlaylist("playlist.m3u")
     self.mpc.play()
-
-    self.printWelcomeScreen()
+    sleep(1)
+    self.lcdPrintUtil.setCurrentStation(self.mpc.getName())
     
     # main loop
     while True:
       btn_input = self.readButtonInputs()
       if(btn_input == 1):
         self.mpc.playNextStation()
-        self.printNextStation()
+        self.lcdPrintUtil.setCurrentStation(self.mpc.getName())
+        self.lcdPrintUtil.printNextStation()
       elif(btn_input ==2):
         self.mpc.playPreviousStation()
-        self.printPreviousStation()
+        self.lcdPrintUtil.setCurrentStation(self.mpc.getName())
+        self.lcdPrintUtil.printPreviousStation()
+      self.lcdPrintUtil.printCurrentStation()
         
-        
-  def printNextStation(self):    
-    self.lcd.clear()
-    self.lcd.writeMessageToLine(">> Next station >>",2,2)
-    sleep(0.5)
-    self.lcd.writeMessageToLine(self.mpc.getName(),2,2)
-
-  def printPreviousStation(self):
-    self.lcd.clear()
-    self.lcd.writeMessageToLine("<< Prev. station <<",2,2)
-    sleep(0.5)
-    self.lcd.writeMessageToLine(self.mpc.getName(),2,2)
-
-  def printWelcomeScreen(self):
-    self.lcd.clear()
-    self.lcd.writeMessageToLine("====================",1,2)
-    self.lcd.writeMessageToLine("=   Raspberry PI   =",2,2)
-    self.lcd.writeMessageToLine("=    Wifi Radio    =",3,2)
-    self.lcd.writeMessageToLine("====================",4,2)
-
-  def printErrorMessage(self, error):
-    self.lcd.clear()
-    self.lcd.writeMessageToLine("An error occured.",2,2)
-    self.lcd.writeMessageToLine(error,3,2)
-    
   def gpioInit(self):
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)

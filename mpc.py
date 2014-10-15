@@ -27,6 +27,9 @@ class MusicPlayerControl(object):
   def play(self, entry=1):    
     self.runCmd(["mpc", "play", str(entry)])
 
+  def stop(self):
+    self.runCmd(["mpc", "stop"])    
+
   def playNextStation(self):
     if(self.currentStation+1 > self.numberOfStations):
       self.currentStation = 1
@@ -46,7 +49,6 @@ class MusicPlayerControl(object):
     new_line_idx = result.index('\n')
     return result[:new_line_idx]
 
-
   def stop(self):
     self.runCmd(["mpc", "stop"])
 
@@ -56,10 +58,9 @@ class MusicPlayerControl(object):
 
     result = subprocess.Popen(cmd,stdout=subprocess.PIPE)
     out, err = result.communicate()
+    if err:
+      print "Error: " + err
     return out
-
-
-    
 
   def loadPlaylist(self, path):
     self.numberOfStations = 0
