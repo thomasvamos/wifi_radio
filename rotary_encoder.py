@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import RPi.GPIO as GPIO
 import time
 from queue_message import Message
@@ -16,8 +18,6 @@ class RotaryEncoder(object):
 		self.msg_id = msg_id
 		self.prev_seq = 0
 	
-		GPIO.setmode(GPIO.BCM)
-
 		# set pins as input with pull up resistor
 		GPIO.setup(self.PIN_A, GPIO.IN, pull_up_down = GPIO.PUD_UP)
 		GPIO.setup(self.PIN_B, GPIO.IN, pull_up_down = GPIO.PUD_UP)

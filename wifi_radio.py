@@ -16,12 +16,21 @@ from time import sleep
 from lcd import CharLCD
 from lcd_print_util import LCDPrintUtil
 from mpc import MusicPlayerControl
+from Queue import Queue
+from rotary_encoder import RotaryEncoder
+from lcd_control import LCDControl
 
 class WifiRadio(object):
 
-  # GPIO input pins for the back and forth buttons 
-  BUTTON_BACK = 17
-  BUTTON_FORWARD = 27
+  # GPIO input pins for the menu rotary encoder 
+  MENU_ROTARY_PIN_A = 17
+  MENU_ROTARY_PIN_B = 27
+  MENU_ROTARY_PIN_BTN = 4
+
+  # GPIO input pins for the volume rotary encoder 
+  # VOLUME_ROTARY_PIN_A = 10
+  # VOLUME_ROTARY_PIN_B = 9
+  # VOLUME_ROTARY_PIN_BTN = 11
 
   # GPIO output pins for the LCD mapping
   LCD_RS = 7
@@ -33,6 +42,7 @@ class WifiRadio(object):
   LED_ON = 15
 
   def __init__(self):
+
     self.gpioInit()
     self.lcd = CharLCD( pin_rs=self.LCD_RS,
                    pin_e=self.LCD_E,
@@ -41,72 +51,32 @@ class WifiRadio(object):
                    pin_d6=self.LCD_D6,
                    pin_d7=self.LCD_D7)
 
+    self.queue = Queue()
     self.mpc = MusicPlayerControl()
-
     self.lcdPrintUtil = LCDPrintUtil(self.lcd, self.mpc, nameShiftEnabled=True)
-
     self.lcdPrintUtil.printWelcomeScreen()
-
+    self.menuRotary = RotaryEncoder( self.MENU_ROTARY_PIN_A,
+                                     self.MENU_ROTARY_PIN_B,
+                                     self.MENU_ROTARY_PIN_BTN,
+                                     self.queue,
+                                     "menu_rotary")
+    self.lcdControl = LCDControl(self.lcd, self.mpc, self.lcdPrintUtil, self.queue)
+    self.lcdControl.start()
+    
     self.mpc.stop()
     self.mpc.clearPlaylist()
     self.mpc.loadPlaylist("playlist.m3u")
     self.mpc.play()
     sleep(1)
     self.lcdPrintUtil.setCurrentStation(self.mpc.getName())
-    
-    # main loop
-    while True:
-      btn_input = self.readButtonInputs()
-      if(btn_input == 1):
-        self.mpc.playNextStation()
-        self.lcdPrintUtil.setCurrentStation(self.mpc.getName())
-        self.lcdPrintUtil.printNextStation()
-      elif(btn_input ==2):
-        self.mpc.playPreviousStation()
-        self.lcdPrintUtil.setCurrentStation(self.mpc.getName())
-        self.lcdPrintUtil.printPreviousStation()
-      self.lcdPrintUtil.printCurrentStation()
-        
+
   def gpioInit(self):
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
 
-    #set GPIO 0 as input
-    GPIO.setup(self.BUTTON_BACK, GPIO.IN)
 
-    #set GPIO 2 as input
-    GPIO.setup(self.BUTTON_FORWARD, GPIO.IN)
-
-  def readButtonInputs(self):  
-  
-    # Initialize  
-    got_prev = False  
-    got_next = False  
-
-    # Read switches  
-    sw1_prev = not GPIO.input(self.BUTTON_BACK)  
-    sw2_next = not GPIO.input(self.BUTTON_FORWARD)  
-
-    # Debounce switches and look for two-button combo  
-    while(sw1_prev or sw2_next):  
-
-      if(sw1_prev):  
-        got_prev = True  
-
-      if(sw2_next):  
-        got_next = True  
-
-      sleep(0.001)
-      sw1_prev = not GPIO.input(self.BUTTON_BACK)  
-      sw2_next = not GPIO.input(self.BUTTON_FORWARD)  
-
-    if(got_prev and got_next):  
-      return 3  
-    if(got_next):
-      return 2  
-    if(got_prev):  
-      return 1  
-    return 0  
 
 if __name__ == '__main__':
   radio = WifiRadio()
+  while True:
+    sleep(0.1)

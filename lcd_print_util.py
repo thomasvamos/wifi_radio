@@ -31,11 +31,9 @@ class LCDPrintUtil(object):
 
   def printCurrentStation(self):
     name = self.currentStationName
-    print "Current Name: " + name
 
     if(self.shiftRequired):
       name = self.getCurrentStationNameWithShift(self.shiftIdx)
-      print "Shifted Name: " + name
       self.shiftIdx +=1
       if self.shiftIdx >= len(self.currentStationName):
         self.shiftIdx = 0
