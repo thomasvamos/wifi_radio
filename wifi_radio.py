@@ -19,47 +19,40 @@ from mpc import MusicPlayerControl
 from Queue import Queue
 from rotary_encoder import RotaryEncoder
 from lcd_control import LCDControl
+from wifi_radio_constants import WifiRadioConstants as WRC
 
 class WifiRadio(object):
-
-  # GPIO input pins for the menu rotary encoder 
-  MENU_ROTARY_PIN_A = 17
-  MENU_ROTARY_PIN_B = 27
-  MENU_ROTARY_PIN_BTN = 4
-
-  # GPIO input pins for the volume rotary encoder 
-  # VOLUME_ROTARY_PIN_A = 10
-  # VOLUME_ROTARY_PIN_B = 9
-  # VOLUME_ROTARY_PIN_BTN = 11
-
-  # GPIO output pins for the LCD mapping
-  LCD_RS = 7
-  LCD_E  = 8
-  LCD_D4 = 25 
-  LCD_D5 = 24
-  LCD_D6 = 23
-  LCD_D7 = 18
-  LED_ON = 15
 
   def __init__(self):
 
     self.gpioInit()
-    self.lcd = CharLCD( pin_rs=self.LCD_RS,
-                   pin_e=self.LCD_E,
-                   pin_d4=self.LCD_D4,
-                   pin_d5=self.LCD_D5,
-                   pin_d6=self.LCD_D6,
-                   pin_d7=self.LCD_D7)
+    self.lcd = CharLCD( pin_rs = WRC.LCD_RS,
+                        pin_e  = WRC.LCD_E,
+                        pin_d4 = WRC.LCD_D4,
+                        pin_d5 = WRC.LCD_D5,
+                        pin_d6 = WRC.LCD_D6,
+                        pin_d7 = WRC.LCD_D7)
 
     self.queue = Queue()
     self.mpc = MusicPlayerControl()
     self.lcdPrintUtil = LCDPrintUtil(self.lcd, self.mpc, nameShiftEnabled=True)
     self.lcdPrintUtil.printWelcomeScreen()
-    self.menuRotary = RotaryEncoder( self.MENU_ROTARY_PIN_A,
-                                     self.MENU_ROTARY_PIN_B,
-                                     self.MENU_ROTARY_PIN_BTN,
+
+    # initialize menu rotary switch
+    self.menuRotary = RotaryEncoder( WRC.MENU_ROTARY_PIN_A,
+                                     WRC.MENU_ROTARY_PIN_B,
+                                     WRC.MENU_ROTARY_PIN_BTN,
                                      self.queue,
-                                     "menu_rotary")
+                                     WRC.MENU_MSG_ID)
+
+    # intialize volume rotary switch
+    self.volumeRotary = RotaryEncoder(  WRC.VOLUME_ROTARY_PIN_A,
+                                        WRC.VOLUME_ROTARY_PIN_B,
+                                        WRC.VOLUME_ROTARY_PIN_BTN,
+                                        self.queue,
+                                        WRC.VOLUME_MSG_ID)
+
+
     self.lcdControl = LCDControl(self.lcd, self.mpc, self.lcdPrintUtil, self.queue)
     self.lcdControl.start()
     

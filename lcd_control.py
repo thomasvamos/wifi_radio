@@ -2,6 +2,7 @@
 
 import threading
 import time
+from wifi_radio_constants import WifiRadioConstants
 
 
 class LCDControl(threading.Thread):
@@ -20,23 +21,39 @@ class LCDControl(threading.Thread):
 		while self.running:
 			if not self.queue.empty():
 				item = self.queue.get()
-				if item.id == "menu_rotary":
+				if item.id == WifiRadioConstants.MENU_MSG_ID:
 					self.handleRotaryMenuEvent(item.msg)
+				if item.id == WifiRadioConstants.VOLUME_MSG_ID:
+					self.handleRotaryVolumeEvent(item.msg)
 
 
 		print "Stopped lcd control thread"
 
 	def handleRotaryMenuEvent(self, msg):
 		if msg == "clockwise":
-			print "clockwise"
+			print "menu clockwise"
 			self.lcd_util.printNextStation()
 		elif msg == "counterclockwise":
-			print "counterclockwise"
+			print "menu counterclockwise"
 			self.lcd_util.printPreviousStation()
 		elif msg == "button":
-			print "button"
+			print "menu button"
+			self.lcd_util.printButtonPress()
 		else:
-			print "undefined"
+			print "menu undefined"
+
+	def handleRotaryVolumeEvent(self, msg):
+		if msg == "clockwise":
+			print "volume clockwise"
+			self.lcd_util.printVolumeUp()
+		elif msg == "counterclockwise":
+			print "volume counterclockwise"
+			self.lcd_util.printVolumeDown()
+		elif msg == "button":
+			print "volume button"
+			self.lcd_util.printButtonPress()
+		else:
+			print "volume undefined"
 
 
 

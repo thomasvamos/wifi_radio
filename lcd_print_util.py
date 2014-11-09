@@ -58,11 +58,48 @@ class LCDPrintUtil(object):
     dateTime = self.dateTimeUtil.getTime() + " " + self.dateTimeUtil.getDate()
     self.lcd.writeMessageToLine(dateTime , 3, 2)
 
+  def printVolumeUp(self):    
+    self.lcd.clear()
+    self.printVolumeUpMsg()
+    sleep(0.5)
+    self.lcd.writeMessageToLine(self.mpc.getName(),2,2)
+    dateTime = self.dateTimeUtil.getTime() + " " + self.dateTimeUtil.getDate()
+    self.lcd.writeMessageToLine(dateTime,3,2)
+
+  def printVolumeDown(self):    
+    self.lcd.clear()
+    self.printVolumeDownMsg()
+    sleep(0.5)
+    self.lcd.writeMessageToLine(self.mpc.getName(),2,2)
+    dateTime = self.dateTimeUtil.getTime() + " " + self.dateTimeUtil.getDate()
+    self.lcd.writeMessageToLine(dateTime,3,2)
+
   def printWelcomeScreen(self):
     self.lcd.clear()
     self.lcd.writeMessageToLine("====================",1,2)
     self.lcd.writeMessageToLine("=   Raspberry PI   =",2,2)
     self.lcd.writeMessageToLine("=    Wifi Radio    =",3,2)
+    self.lcd.writeMessageToLine("====================",4,2)
+
+  def printButtonPress(self):
+    self.lcd.clear()
+    self.lcd.writeMessageToLine("====================",1,2)
+    self.lcd.writeMessageToLine("=     Pressed      =",2,2)
+    self.lcd.writeMessageToLine("=     Button       =",3,2)
+    self.lcd.writeMessageToLine("====================",4,2)
+
+  def printVolumeDownMsg(self):
+    self.lcd.clear()
+    self.lcd.writeMessageToLine("====================",1,2)
+    self.lcd.writeMessageToLine("=      Volume      =",2,2)
+    self.lcd.writeMessageToLine("=       Down       =",3,2)
+    self.lcd.writeMessageToLine("====================",4,2)
+
+  def printVolumeUpMsg(self):
+    self.lcd.clear()
+    self.lcd.writeMessageToLine("====================",1,2)
+    self.lcd.writeMessageToLine("=      Volume      =",2,2)
+    self.lcd.writeMessageToLine("=        Up        =",3,2)
     self.lcd.writeMessageToLine("====================",4,2)
 
   def printErrorMessage(self, error):
