@@ -7,11 +7,10 @@ from wifi_radio_constants import WifiRadioConstants
 
 class LCDControl(threading.Thread):
 
-	def __init__(self, lcd, mpc, lcd_util, queue):
+	def __init__(self, lcd, lcd_util, queue):
 		threading.Thread.__init__(self)
 		self.daemon = True
 		self.lcd = lcd
-		self.mpc = mpc
 		self.lcd_util = lcd_util
 		self.queue = queue
 		self.running = True
@@ -31,29 +30,29 @@ class LCDControl(threading.Thread):
 
 	def handleRotaryMenuEvent(self, msg):
 		if msg == "clockwise":
-			print "menu clockwise"
+			print "lcd menu clockwise"
 			self.lcd_util.printNextStation()
 		elif msg == "counterclockwise":
-			print "menu counterclockwise"
+			print "lcd menu counterclockwise"
 			self.lcd_util.printPreviousStation()
 		elif msg == "button":
-			print "menu button"
+			print "lcd menu button"
 			self.lcd_util.printButtonPress()
 		else:
-			print "menu undefined"
+			print "lcd menu undefined"
 
 	def handleRotaryVolumeEvent(self, msg):
 		if msg == "clockwise":
-			print "volume clockwise"
+			print "lcd volume clockwise"
 			self.lcd_util.printVolumeUp()
 		elif msg == "counterclockwise":
-			print "volume counterclockwise"
+			print "lcd volume counterclockwise"
 			self.lcd_util.printVolumeDown()
 		elif msg == "button":
-			print "volume button"
+			print "lcd volume button"
 			self.lcd_util.printButtonPress()
 		else:
-			print "volume undefined"
+			print "lcd volume undefined"
 
 
 

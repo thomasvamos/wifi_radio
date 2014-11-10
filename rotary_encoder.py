@@ -3,6 +3,7 @@
 import RPi.GPIO as GPIO
 import time
 from queue_message import Message
+import threading
 
 class RotaryEncoder(object):
 
@@ -17,6 +18,7 @@ class RotaryEncoder(object):
 		self.queue = queue
 		self.msg_id = msg_id
 		self.prev_seq = 0
+		self.threadLock = threading.Lock()
 	
 		# set pins as input with pull up resistor
 		GPIO.setup(self.PIN_A, GPIO.IN, pull_up_down = GPIO.PUD_UP)
@@ -42,11 +44,17 @@ class RotaryEncoder(object):
 				self.prev_seq = seq
 			elif seq == 2:
 				if self.prev_seq == 1:
+					print "Rotary clockwise"
 					self.prev_seq = 0
+					self.threadLock.acquire()
 					self.queue.put(Message(self.msg_id, RotaryEncoder.CW))
+					self.threadLock.release()
 				elif self.prev_seq == 3:
+					print "Rotary counterclockwise"
 					self.prev_seq = 0
+					self.threadLock.acquire()
 					self.queue.put(Message(self.msg_id, RotaryEncoder.CCW))
+					self.threadLock.release()
 
 	def button_isr(self, channel):
 

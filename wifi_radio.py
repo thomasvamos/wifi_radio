@@ -19,7 +19,9 @@ from mpc import MusicPlayerControl
 from Queue import Queue
 from rotary_encoder import RotaryEncoder
 from lcd_control import LCDControl
+from mpc_control import MPCControl
 from wifi_radio_constants import WifiRadioConstants as WRC
+import threading
 
 class WifiRadio(object):
 
@@ -34,9 +36,12 @@ class WifiRadio(object):
                         pin_d7 = WRC.LCD_D7)
 
     self.queue = Queue()
+    self.lcdQueue = Queue()
+    self.mpcQueue = Queue()
     self.mpc = MusicPlayerControl()
     self.lcdPrintUtil = LCDPrintUtil(self.lcd, self.mpc, nameShiftEnabled=True)
     self.lcdPrintUtil.printWelcomeScreen()
+    self.threadLock = threading.Lock()
 
     # initialize menu rotary switch
     self.menuRotary = RotaryEncoder( WRC.MENU_ROTARY_PIN_A,
@@ -53,15 +58,20 @@ class WifiRadio(object):
                                         WRC.VOLUME_MSG_ID)
 
 
-    self.lcdControl = LCDControl(self.lcd, self.mpc, self.lcdPrintUtil, self.queue)
+    self.lcdControl = LCDControl(self.lcd, self.lcdPrintUtil, self.lcdQueue)
     self.lcdControl.start()
-    
-    self.mpc.stop()
-    self.mpc.clearPlaylist()
-    self.mpc.loadPlaylist("playlist.m3u")
-    self.mpc.play()
-    sleep(1)
-    self.lcdPrintUtil.setCurrentStation(self.mpc.getName())
+
+    self.mpcControl = MPCControl(self.mpc, self.mpcQueue)
+    self.mpcControl.start()
+
+    while True:
+      if not self.queue.empty():
+        self.threadLock.acquire()
+        item = self.queue.get()
+        self.lcdQueue.put(item)
+        self.mpcQueue.put(item)
+        self.threadLock.release()
+
 
   def gpioInit(self):
     GPIO.setwarnings(False)
@@ -71,5 +81,3 @@ class WifiRadio(object):
 
 if __name__ == '__main__':
   radio = WifiRadio()
-  while True:
-    sleep(0.1)

@@ -30,6 +30,15 @@ class MusicPlayerControl(object):
   def stop(self):
     self.runCmd(["mpc", "stop"])    
 
+  def toggle(self):
+    self.runCmd(["mpc", "toggle"])
+
+  def increaseVolume(self):
+    self.runCmd(["mpc", "volume", "+5"])
+
+  def decreaseVolume(self):
+    self.runCmd(["mpc", "volume", "-5"])    
+
   def playNextStation(self):
     if(self.currentStation+1 > self.numberOfStations):
       self.currentStation = 1
