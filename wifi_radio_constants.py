@@ -2,15 +2,12 @@
 
 class WifiRadioConstants(object):
 
-  # GPIO input pins for the menu rotary encoder 
-  MENU_ROTARY_PIN_A = 17 #GPIO0
-  MENU_ROTARY_PIN_B = 27 #GPIO2
-  MENU_ROTARY_PIN_BTN = 4 #GPIO7
+  # GPIO input pins for rotary encoders
+  MENU_ROTARY_LEFT_TURN_PIN =17 #GPIO_0 
+  MENU_ROTARY_RIGHT_TURN_PIN = 4 #GPIO_7
 
-  # GPIO input pins for the volume rotary encoder 
-  VOLUME_ROTARY_PIN_A = 11 #SCLK
-  VOLUME_ROTARY_PIN_B = 9 #MISO
-  VOLUME_ROTARY_PIN_BTN = 10 #MOSI
+  VOLUME_ROTARY_LEFT_TURN_PIN = 27 #GPIO_2
+  VOLUME_ROTARY_RIGHT_TURN_PIN = 22 #GPIO_3
 
   # GPIO output pins for the LCD mapping
   LCD_RS = 7
@@ -21,5 +18,11 @@ class WifiRadioConstants(object):
   LCD_D7 = 18
   LED_ON = 15
 
-  MENU_MSG_ID = "menu_rotary"
-  VOLUME_MSG_ID = "volume_rotary"
+  # Rotary encoder messages for multihtread communication
+  MENU_LEFT_TURN_MSG = 0
+  MENU_RIGHT_TURN_MSG = 1
+
+  VOLUME_LEFT_TURN_MSG = 2
+  VOLUME_RIGHT_TURN_MSG = 3
+  TICK = 4
+  

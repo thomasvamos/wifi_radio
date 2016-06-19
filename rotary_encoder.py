@@ -44,16 +44,19 @@ class RotaryEncoder(object):
 				self.prev_seq = seq
 			elif seq == 2:
 				if self.prev_seq == 1:
-					print "Rotary clockwise"
 					self.prev_seq = 0
 					self.threadLock.acquire()
-					self.queue.put(Message(self.msg_id, RotaryEncoder.CW))
+					msg = Message(self.msg_id, RotaryEncoder.CW, time.time())
+					print "Add message: [ ID: " + str(msg.id) + ", Direction: " + msg.msg + ", Timestamp: " + str(msg.timestamp)
+					self.queue.put(msg)
 					self.threadLock.release()
 				elif self.prev_seq == 3:
-					print "Rotary counterclockwise"
 					self.prev_seq = 0
 					self.threadLock.acquire()
-					self.queue.put(Message(self.msg_id, RotaryEncoder.CCW))
+					msg = Message(self.msg_id, RotaryEncoder.CCW, time.time())
+					print "Add message: [ ID: " + str(msg.id) + ", Direction: " + msg.msg + ", Timestamp: " + str(msg.timestamp)
+					self.queue.put(msg)
+
 					self.threadLock.release()
 
 	def button_isr(self, channel):

@@ -2,7 +2,9 @@
 
 import threading
 import time
-from wifi_radio_constants import WifiRadioConstants
+from time import sleep
+from wifi_radio_constants import WifiRadioConstants as WRC
+from threading import Timer
 
 
 class LCDControl(threading.Thread):
@@ -16,43 +18,37 @@ class LCDControl(threading.Thread):
 		self.running = True
 
 	def run(self):
-		self.running = True
 		while self.running:
 			if not self.queue.empty():
 				item = self.queue.get()
-				if item.id == WifiRadioConstants.MENU_MSG_ID:
-					self.handleRotaryMenuEvent(item.msg)
-				if item.id == WifiRadioConstants.VOLUME_MSG_ID:
-					self.handleRotaryVolumeEvent(item.msg)
-
+				print "Handling incoming message" + str(item)
+				self.handleMsg(item)
 
 		print "Stopped lcd control thread"
 
-	def handleRotaryMenuEvent(self, msg):
-		if msg == "clockwise":
-			print "lcd menu clockwise"
-			self.lcd_util.printNextStation()
-		elif msg == "counterclockwise":
-			print "lcd menu counterclockwise"
+	def handleMsg(self, item):
+		print "Msg Item: " + str(item)
+		if item == WRC.MENU_LEFT_TURN_MSG:
+			print "MENU LEFT TURN"
 			self.lcd_util.printPreviousStation()
-		elif msg == "button":
-			print "lcd menu button"
-			self.lcd_util.printButtonPress()
-		else:
-			print "lcd menu undefined"
-
-	def handleRotaryVolumeEvent(self, msg):
-		if msg == "clockwise":
-			print "lcd volume clockwise"
-			self.lcd_util.printVolumeUp()
-		elif msg == "counterclockwise":
-			print "lcd volume counterclockwise"
+		elif item == WRC.MENU_RIGHT_TURN_MSG:
+			print "MENU RIGHT TURN"
+			self.lcd_util.printNextStation()
+		elif item == WRC.VOLUME_LEFT_TURN_MSG:
+			print "VOLUME LEFT TURN"
 			self.lcd_util.printVolumeDown()
-		elif msg == "button":
-			print "lcd volume button"
-			self.lcd_util.printButtonPress()
+		elif item == WRC.VOLUME_RIGHT_TURN_MSG:
+			print "VOLUME RIGHT TURN"
+			self.lcd_util.printVolumeUp()
+		elif item == WRC.TICK:
+			print "TICK"
+			self.lcd_util.printCurrentStation()
 		else:
-			print "lcd volume undefined"
+			print "DEFAULT"
+			self.lcd_util.printCurrentStation()
+
+
+	
 
 
 

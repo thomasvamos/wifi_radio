@@ -1,11 +1,32 @@
 #!/usr/bin/python
 
+import threading
 from time import sleep
 from date_time_util import DateTimeUtil
+from threading import Timer
 
-class LCDPrintUtil(object):
+class LCDPrintUtil(threading.Thread):
+
+  timeToReturnToCurrentStation = 10.0
+  
+  # display messages
+  
+  lineFrameMsg =        "===================="
+  lineEmptyMsg =        "                    "
+  welcomeMsg =          "=====================   Raspberry PI   ==    Wifi Radio    ====================="
+  laodingMsg =          "=====================      Loading     ==       ...        ====================="
+  volumeUpMsg =         "=====================     Volume       ==        Up        ====================="
+  volumeDownMsg =       "=====================     Volume       ==       Down       ====================="
+  nextStationMsg =      "=====================   > Next     >   ==   > Station  >   ====================="
+  previousStationMsg =  "=====================   < Previous <   ==   > Station  >   ====================="
+  errorMsg =            "=====================       Error      ==     Occured      ====================="
 
   def __init__(self, lcd, mpc, nameShiftEnabled=False):
+    
+    threading.Thread.__init__(self)
+    self.daemon = True
+    self.running = True
+
     self.lcd = lcd
     self.mpc = mpc
     self.dateTimeUtil = DateTimeUtil()
@@ -13,6 +34,33 @@ class LCDPrintUtil(object):
     self.nameShiftEnabled = nameShiftEnabled
     self.shiftRequired = False
     self.shiftIdx = 0
+    self.currentStationEnabled = True
+    self.displayContent = LCDPrintUtil.welcomeMsg
+    self.screenResetCtr = 10
+    self.awaitingScreenReset = False
+    self.setAwaitingScreenReset()
+
+  def run(self):
+    while self.running:
+      if self.awaitingScreenReset and self.screenResetCtr > 0:
+        self.screenResetCtr -= 1
+
+      if self.awaitingScreenReset and self.screenResetCtr == 0:
+        self.printCurrentStation()
+        self.awaitingScreenReset = False
+
+      if not self.awaitingScreenReset:
+        self.printCurrentStation()
+
+      self.printScreen()
+      sleep(0.1)    
+
+  def printScreen(self):
+    self.lcd.writeMessage(self.displayContent)
+
+  def setAwaitingScreenReset(self):
+    self.awaitingScreenReset = True
+    self.screenResetCtr = 10
 
   def setCurrentStation(self, currentStationName):
     self.currentStationName = currentStationName
@@ -38,71 +86,36 @@ class LCDPrintUtil(object):
       if self.shiftIdx >= len(self.currentStationName):
         self.shiftIdx = 0
 
-    self.lcd.writeMessageToLine(name,2,2)
-    dateTime = self.dateTimeUtil.getTime() + " " + self.dateTimeUtil.getDate()
-    self.lcd.writeMessageToLine(dateTime,3,2)
+    if(len(name) > 20):
+      name = name[:17] + '...'
+
+    if(len(name) == 0):
+      name = LCDPrintUtil.lineEmptyMsg
+
+    dateTime = " " + self.dateTimeUtil.getTime() + " " + self.dateTimeUtil.getDate() + " "
+    self.displayContent = LCDPrintUtil.lineFrameMsg + name + dateTime + LCDPrintUtil.lineFrameMsg
 
   def printNextStation(self):    
-    self.lcd.clear()
-    self.lcd.writeMessageToLine(">> Next station >>",2,2)
-    sleep(0.5)
-    self.lcd.writeMessageToLine(self.mpc.getName(),2,2)
-    dateTime = self.dateTimeUtil.getTime() + " " + self.dateTimeUtil.getDate()
-    self.lcd.writeMessageToLine(dateTime,3,2)
+    self.displayContent = LCDPrintUtil.nextStationMsg
+    self.setAwaitingScreenReset()
+    
 
   def printPreviousStation(self):
-    self.lcd.clear()
-    self.lcd.writeMessageToLine("<< Prev. station <<",2,2)
-    sleep(0.5)
-    self.lcd.writeMessageToLine(self.mpc.getName(),2,2)
-    dateTime = self.dateTimeUtil.getTime() + " " + self.dateTimeUtil.getDate()
-    self.lcd.writeMessageToLine(dateTime , 3, 2)
+    self.displayContent = LCDPrintUtil.previousStationMsg
+    self.setAwaitingScreenReset()
 
-  def printVolumeUp(self):    
-    self.lcd.clear()
-    self.printVolumeUpMsg()
-    sleep(0.5)
-    self.lcd.writeMessageToLine(self.mpc.getName(),2,2)
-    dateTime = self.dateTimeUtil.getTime() + " " + self.dateTimeUtil.getDate()
-    self.lcd.writeMessageToLine(dateTime,3,2)
+  def printVolumeUp(self):
+    self.displayContent = LCDPrintUtil.volumeUpMsg
+    self.setAwaitingScreenReset()
 
-  def printVolumeDown(self):    
-    self.lcd.clear()
-    self.printVolumeDownMsg()
-    sleep(0.5)
-    self.lcd.writeMessageToLine(self.mpc.getName(),2,2)
-    dateTime = self.dateTimeUtil.getTime() + " " + self.dateTimeUtil.getDate()
-    self.lcd.writeMessageToLine(dateTime,3,2)
+  def printVolumeDown(self):   
+    self.displayContent = LCDPrintUtil.volumeDownMsg
+    self.setAwaitingScreenReset()
 
-  def printWelcomeScreen(self):
-    self.lcd.clear()
-    self.lcd.writeMessageToLine("====================",1,2)
-    self.lcd.writeMessageToLine("=   Raspberry PI   =",2,2)
-    self.lcd.writeMessageToLine("=    Wifi Radio    =",3,2)
-    self.lcd.writeMessageToLine("====================",4,2)
-
-  def printButtonPress(self):
-    self.lcd.clear()
-    self.lcd.writeMessageToLine("====================",1,2)
-    self.lcd.writeMessageToLine("=     Pressed      =",2,2)
-    self.lcd.writeMessageToLine("=     Button       =",3,2)
-    self.lcd.writeMessageToLine("====================",4,2)
-
-  def printVolumeDownMsg(self):
-    self.lcd.clear()
-    self.lcd.writeMessageToLine("====================",1,2)
-    self.lcd.writeMessageToLine("=      Volume      =",2,2)
-    self.lcd.writeMessageToLine("=       Down       =",3,2)
-    self.lcd.writeMessageToLine("====================",4,2)
-
-  def printVolumeUpMsg(self):
-    self.lcd.clear()
-    self.lcd.writeMessageToLine("====================",1,2)
-    self.lcd.writeMessageToLine("=      Volume      =",2,2)
-    self.lcd.writeMessageToLine("=        Up        =",3,2)
-    self.lcd.writeMessageToLine("====================",4,2)
+  def printLoadingMsg(self):
+    self.displayContent = LCDPrintUtil.laodingMsg
+    self.setAwaitingScreenReset()
 
   def printErrorMessage(self, error):
-    self.lcd.clear()
-    self.lcd.writeMessageToLine("An error occured.",2,2)
-    self.lcd.writeMessageToLine(error,3,2)
+    self.displayContent = LCDPrintUtil.errorMsg
+    self.setAwaitingScreenReset()

@@ -8,7 +8,7 @@
 # Date   : 14.09.2014
 #
 # Based on code from the following resources:
-# Matt Hawkins: http://www.raspberrypi-spy.co.uk/2012/08/20x4-lcd-module-control-using-python/
+# Matt Hawkins: http://www.raspberrypi-spy.co.uk/2012/07/16x2-lcd-module-control-using-python/
 # Adafruit: https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code/blob/master/Adafruit_CharLCD/Adafruit_CharLCD.py
 #
 

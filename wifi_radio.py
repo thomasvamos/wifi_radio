@@ -12,72 +12,81 @@
 # http://usualpanic.com/2013/05/raspberry-pi-internet-radio/
 
 import RPi.GPIO as GPIO
-from time import sleep
 from lcd import CharLCD
 from lcd_print_util import LCDPrintUtil
 from mpc import MusicPlayerControl
-from Queue import Queue
-from rotary_encoder import RotaryEncoder
-from lcd_control import LCDControl
-from mpc_control import MPCControl
 from wifi_radio_constants import WifiRadioConstants as WRC
-import threading
+from commands.init import Init
+import time
+from time import sleep
+from radio_control import RadioControl
+from lcd_control import LCDControl
+from Queue import Queue
+import signal
+
 
 class WifiRadio(object):
 
-  def __init__(self):
+    def __init__(self):
 
-    self.gpioInit()
-    self.lcd = CharLCD( pin_rs = WRC.LCD_RS,
-                        pin_e  = WRC.LCD_E,
-                        pin_d4 = WRC.LCD_D4,
-                        pin_d5 = WRC.LCD_D5,
-                        pin_d6 = WRC.LCD_D6,
-                        pin_d7 = WRC.LCD_D7)
+        self.gpioInit()
+        self.lcd = CharLCD( pin_rs = WRC.LCD_RS,
+            pin_e  = WRC.LCD_E,
+            pin_d4 = WRC.LCD_D4,
+            pin_d5 = WRC.LCD_D5,
+            pin_d6 = WRC.LCD_D6,
+            pin_d7 = WRC.LCD_D7)
 
-    self.queue = Queue()
-    self.lcdQueue = Queue()
-    self.mpcQueue = Queue()
-    self.mpc = MusicPlayerControl()
-    self.lcdPrintUtil = LCDPrintUtil(self.lcd, self.mpc, nameShiftEnabled=True)
-    self.lcdPrintUtil.printWelcomeScreen()
-    self.threadLock = threading.Lock()
+         # init music player controller
+        self.mpc = MusicPlayerControl()
 
-    # initialize menu rotary switch
-    self.menuRotary = RotaryEncoder( WRC.MENU_ROTARY_PIN_A,
-                                     WRC.MENU_ROTARY_PIN_B,
-                                     WRC.MENU_ROTARY_PIN_BTN,
-                                     self.queue,
-                                     WRC.MENU_MSG_ID)
+        self.lcdPrintUtil = LCDPrintUtil(self.lcd, self.mpc, nameShiftEnabled=True)
+        self.lcdPrintUtil.start()
 
-    # intialize volume rotary switch
-    self.volumeRotary = RotaryEncoder(  WRC.VOLUME_ROTARY_PIN_A,
-                                        WRC.VOLUME_ROTARY_PIN_B,
-                                        WRC.VOLUME_ROTARY_PIN_BTN,
-                                        self.queue,
-                                        WRC.VOLUME_MSG_ID)
+        # init lcd controller
+        self.lcdMsgQueue = Queue()
+        self.lcdControl = LCDControl(self.lcd, self.lcdPrintUtil, self.lcdMsgQueue)
+        self.lcdControl.start()
 
+        # set up GPIOs as inputs.
+        GPIO.setup(WRC.MENU_ROTARY_LEFT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(WRC.MENU_ROTARY_RIGHT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-    self.lcdControl = LCDControl(self.lcd, self.lcdPrintUtil, self.lcdQueue)
-    self.lcdControl.start()
+        GPIO.setup(WRC.VOLUME_ROTARY_LEFT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(WRC.VOLUME_ROTARY_RIGHT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-    self.mpcControl = MPCControl(self.mpc, self.mpcQueue)
-    self.mpcControl.start()
+        GPIO.add_event_detect(WRC.MENU_ROTARY_LEFT_TURN_PIN, GPIO.RISING, callback=self.isr_menu_left)  
+        GPIO.add_event_detect(WRC.MENU_ROTARY_RIGHT_TURN_PIN, GPIO.RISING, callback=self.isr_menu_right)  
 
-    while True:
-      if not self.queue.empty():
-        self.threadLock.acquire()
-        item = self.queue.get()
-        self.lcdQueue.put(item)
-        self.mpcQueue.put(item)
-        self.threadLock.release()
+        GPIO.add_event_detect(WRC.VOLUME_ROTARY_LEFT_TURN_PIN, GPIO.RISING, callback=self.isr_volume_left)  
+        GPIO.add_event_detect(WRC.VOLUME_ROTARY_RIGHT_TURN_PIN, GPIO.RISING, callback=self.isr_volume_right)  
 
+        init = Init(self.mpc)
+        init.start()
 
-  def gpioInit(self):
-    GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BCM)
+        # pause thread
+        while True:
+            sleep(0.5)
 
+    def gpioInit(self):
+        GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.BCM)
 
+    def isr_volume_left(self, channel):
+        print "Volume turn left"
+        self.lcdMsgQueue.put(WRC.VOLUME_LEFT_TURN_MSG)
+
+    def isr_volume_right(self, channel):
+        print "Volume turn right"
+        self.lcdMsgQueue.put(WRC.VOLUME_RIGHT_TURN_MSG)
+
+    def isr_menu_left(self, channel):
+        print "Menu turn left"
+        self.lcdMsgQueue.put(WRC.MENU_LEFT_TURN_MSG)
+
+    def isr_menu_right(self, channel):
+        print "Menu turn right"
+        self.lcdMsgQueue.put(WRC.MENU_RIGHT_TURN_MSG)
 
 if __name__ == '__main__':
-  radio = WifiRadio()
+    radio = WifiRadio()
