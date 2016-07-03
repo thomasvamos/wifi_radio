@@ -10,13 +10,17 @@
 # Based on code from the following resources:
 import subprocess
 
-class MusicPlayerControl(object):
+class MusicPlayerController(object):
 
   currentStation = 1
   numberOfStations = 0
 
   def __init__(self, quiet=False):
     self.quiet = quiet
+    self.stop()
+    self.clearPlaylist()
+    self.loadPlaylist("playlist.m3u")
+    self.play()
 
   def clearPlaylist(self):
     self.runCmd(["mpc", "clear"])

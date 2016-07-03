@@ -9,16 +9,19 @@ class LCDPrintUtil(threading.Thread):
 
   timeToReturnToCurrentStation = 10.0
   
+  #display sizes
+  lineDigits = 20
+
   # display messages
-  
   lineFrameMsg =        "===================="
   lineEmptyMsg =        "                    "
+  lineNoStationName =   "   Unkown Station   "
   welcomeMsg =          "=====================   Raspberry PI   ==    Wifi Radio    ====================="
   laodingMsg =          "=====================      Loading     ==       ...        ====================="
   volumeUpMsg =         "=====================     Volume       ==        Up        ====================="
   volumeDownMsg =       "=====================     Volume       ==       Down       ====================="
   nextStationMsg =      "=====================   > Next     >   ==   > Station  >   ====================="
-  previousStationMsg =  "=====================   < Previous <   ==   > Station  >   ====================="
+  previousStationMsg =  "=====================   < Previous <   ==   < Station  <   ====================="
   errorMsg =            "=====================       Error      ==     Occured      ====================="
 
   def __init__(self, lcd, mpc, nameShiftEnabled=False):
@@ -63,22 +66,23 @@ class LCDPrintUtil(threading.Thread):
     self.screenResetCtr = 10
 
   def setCurrentStation(self, currentStationName):
+    print "Setting current station to: " + currentStationName
     self.currentStationName = currentStationName
-    if(len(currentStationName) >= 20):
+    if(len(currentStationName) >= LCDPrintUtil.lineDigits):
       self.shiftRequired = True
     else:
       self.shiftRequired = False
 
   def getCurrentStationNameWithShift(self, shift):
       startIdx = self.shiftIdx % len(self.currentStationName)
-      endIdx = (self.shiftIdx + 20) % len(self.currentStationName)
+      endIdx = (self.shiftIdx + LCDPrintUtil.lineDigits) % len(self.currentStationName)
       if startIdx < endIdx:
         return self.currentStationName[startIdx:endIdx]
       else:
         return self.currentStationName[startIdx:len(self.currentStationName)] + self.currentStationName[0:endIdx]
 
   def printCurrentStation(self):
-    name = self.currentStationName
+    name = self.fitNameToDisplayLine(self.currentStationName)
 
     if(self.shiftRequired):
       name = self.getCurrentStationNameWithShift(self.shiftIdx)
@@ -86,14 +90,27 @@ class LCDPrintUtil(threading.Thread):
       if self.shiftIdx >= len(self.currentStationName):
         self.shiftIdx = 0
 
-    if(len(name) > 20):
-      name = name[:17] + '...'
-
-    if(len(name) == 0):
-      name = LCDPrintUtil.lineEmptyMsg
-
     dateTime = " " + self.dateTimeUtil.getTime() + " " + self.dateTimeUtil.getDate() + " "
     self.displayContent = LCDPrintUtil.lineFrameMsg + name + dateTime + LCDPrintUtil.lineFrameMsg
+
+  def fitNameToDisplayLine(self, name):
+    if(len(name) <= 0):
+      name = LCDPrintUtil.lineNoStationName
+    
+    elif(len(name) > LCDPrintUtil.lineDigits):
+      name = name[:17] + '...'
+
+    else:
+      name = self.centerNameInLine(name)
+    return name
+
+  def centerNameInLine(self, name):
+    if len(name) % 2 == 0:
+      noOfSpaces = (LCDPrintUtil.lineDigits - len(name)) / 2
+      return " " * noOfSpaces + name + " " * noOfSpaces
+    else:
+      noOfSpaces = (LCDPrintUtil.lineDigits - len(name)-1) / 2
+      return " " * noOfSpaces + name + " " * (noOfSpaces + 1)
 
   def printNextStation(self):    
     self.displayContent = LCDPrintUtil.nextStationMsg
