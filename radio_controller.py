@@ -15,6 +15,7 @@ class RadioController(threading.Thread):
     self.daemon = True
     self.running = True
     self.queue = queue
+    self.currentStationName = ""
 
     # init LCD Display
     self.lcd = CharLCD( pin_rs = WRC.LCD_RS,
@@ -28,12 +29,12 @@ class RadioController(threading.Thread):
     self.mpc = MusicPlayerController()
 
     # init lcd display
-    self.lcdPrintUtil = LCDPrintUtil(self.lcd, self.mpc, nameShiftEnabled=True)
+    self.lcdPrintUtil = LCDPrintUtil(self.lcd, nameShiftEnabled=True)
     self.lcdPrintUtil.start()
 
     #print current station name
-    name = self.mpc.getName()
-    self.lcdPrintUtil.setCurrentStation(name)
+    self.currentStationName = self.mpc.getName()
+    self.lcdPrintUtil.setCurrentStation(self.currentStationName)
 
     #init = Init(self.mpc)
     #init.start()
@@ -45,6 +46,10 @@ class RadioController(threading.Thread):
         item = self.queue.get()
         print "Handling incoming message" + str(item)
         self.handleMsg(item)
+
+      if not self.currentStationName:
+        self.currentStationName = self.mpc.getName()
+        self.lcdPrintUtil.setCurrentStation(self.currentStationName)
 
     print "Stopped lcd control thread"
 

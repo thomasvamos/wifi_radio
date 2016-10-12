@@ -18,11 +18,16 @@ import time
 from time import sleep
 from Queue import Queue
 import signal
+import serial
 
 
 class WifiRadio(object):
 
     def __init__(self):
+
+        # initialize serial port
+        ser = serial.Serial('/dev/ttyAMA0', 9600, timeout=1)
+        ser.open()
 
         self.gpioInit()
 
@@ -33,21 +38,43 @@ class WifiRadio(object):
         self.radioController.start()
 
         # set up GPIOs as inputs.
+
+        # set up press buttons
+        GPIO.setup(WRC.MENU_ROTARY_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.add_event_detect(WRC.MENU_ROTARY_BUTTON_PIN, GPIO.RISING, callback=self.isr_menu_press)  
+
+        GPIO.setup(WRC.VOLUME_ROTARY_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.add_event_detect(WRC.VOLUME_ROTARY_BUTTON_PIN, GPIO.RISING, callback=self.isr_volume_press)  
+
+        # set up menu rotary encoder
         GPIO.setup(WRC.MENU_ROTARY_LEFT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         GPIO.setup(WRC.MENU_ROTARY_RIGHT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-
-        GPIO.setup(WRC.VOLUME_ROTARY_LEFT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.setup(WRC.VOLUME_ROTARY_RIGHT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-
         GPIO.add_event_detect(WRC.MENU_ROTARY_LEFT_TURN_PIN, GPIO.RISING, callback=self.isr_menu_left)  
         GPIO.add_event_detect(WRC.MENU_ROTARY_RIGHT_TURN_PIN, GPIO.RISING, callback=self.isr_menu_right)  
 
+        # set up volume rotary encoder
+        GPIO.setup(WRC.VOLUME_ROTARY_LEFT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(WRC.VOLUME_ROTARY_RIGHT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         GPIO.add_event_detect(WRC.VOLUME_ROTARY_LEFT_TURN_PIN, GPIO.RISING, callback=self.isr_volume_left)  
         GPIO.add_event_detect(WRC.VOLUME_ROTARY_RIGHT_TURN_PIN, GPIO.RISING, callback=self.isr_volume_right)  
 
         # pause thread
-        while True:
-            sleep(0.5)
+        try:
+            while 1:
+                response = ser.readline().strip()
+                print repr(response)
+                if response == "66":
+                    print "menu left"
+                    self.isr_menu_left(0)
+                elif response == "99":
+                    print "menu right"
+                    self.isr_menu_right(0)
+                elif response == "15":
+                    print "menu press"
+                    self.isr_menu_press(0)
+
+        except KeyboardInterrupt:
+            ser.close()
 
     def gpioInit(self):
         GPIO.setwarnings(False)
@@ -61,6 +88,9 @@ class WifiRadio(object):
         print "Volume turn right"
         self.msgQueue.put(WRC.VOLUME_RIGHT_TURN_MSG)
 
+    def isr_volume_press(self, channel):
+        print "Volume button pressed"
+
     def isr_menu_left(self, channel):
         print "Menu turn left"
         self.msgQueue.put(WRC.MENU_LEFT_TURN_MSG)
@@ -68,6 +98,9 @@ class WifiRadio(object):
     def isr_menu_right(self, channel):
         print "Menu turn right"
         self.msgQueue.put(WRC.MENU_RIGHT_TURN_MSG)
+
+    def isr_menu_press(self, channel):
+        print "Menu button pressed"
 
 if __name__ == '__main__':
     radio = WifiRadio()

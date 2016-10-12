@@ -5,9 +5,11 @@ class WifiRadioConstants(object):
   # GPIO input pins for rotary encoders
   MENU_ROTARY_LEFT_TURN_PIN =17 #GPIO_0 
   MENU_ROTARY_RIGHT_TURN_PIN = 4 #GPIO_7
+  MENU_ROTARY_BUTTON_PIN = 2 # SDA
 
   VOLUME_ROTARY_LEFT_TURN_PIN = 27 #GPIO_2
   VOLUME_ROTARY_RIGHT_TURN_PIN = 22 #GPIO_3
+  VOLUME_ROTARY_BUTTON_PIN = 3 #SCL
 
   # GPIO output pins for the LCD mapping
   LCD_RS = 7

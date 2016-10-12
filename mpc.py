@@ -59,6 +59,7 @@ class MusicPlayerController(object):
 
   def getName(self):
     result = self.runCmd(["mpc", "-f", "%name%"])
+    print "MPC Current Station: " + result
     new_line_idx = result.index('\n')
     return result[:new_line_idx]
 

@@ -24,14 +24,13 @@ class LCDPrintUtil(threading.Thread):
   previousStationMsg =  "=====================   < Previous <   ==   < Station  <   ====================="
   errorMsg =            "=====================       Error      ==     Occured      ====================="
 
-  def __init__(self, lcd, mpc, nameShiftEnabled=False):
+  def __init__(self, lcd, nameShiftEnabled=False):
     
     threading.Thread.__init__(self)
     self.daemon = True
     self.running = True
 
     self.lcd = lcd
-    self.mpc = mpc
     self.dateTimeUtil = DateTimeUtil()
     self.currentStationName = ""
     self.nameShiftEnabled = nameShiftEnabled

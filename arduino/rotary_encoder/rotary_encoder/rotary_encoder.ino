@@ -6,15 +6,18 @@ RotaryEncoder encoder(A2, A3);
 int leftTurnPin = A1;
 int rightTurnPin = A0;
 
+const int buttonPin1 = 12;
+const int buttonPin2 = 13;
+
 void setup()
 {
-  Serial.begin(57600);
-  Serial.println("SimplePollRotator example for the RotaryEncoder library.");
+  Serial.begin(9600);
 
   // You may have to modify the next 2 lines if using other pins than A2 and A3
   PCICR |= (1 << PCIE1);    // This enables Pin Change Interrupt 1 that covers the Analog input pins or Port C.
   PCMSK1 |= (1 << PCINT10) | (1 << PCINT11);  // This enables the interrupt for pin 2 and 3 of Port C.
 
+  // rotary encoder pins
   pinMode(leftTurnPin, OUTPUT);
   pinMode(rightTurnPin, OUTPUT);
 }
@@ -29,25 +32,25 @@ ISR(PCINT1_vect) {
 // Read the current position of the encoder and print out when changed.
 void loop()
 {
+  processRotaryEncoderState();
+} 
+
+void processRotaryEncoderState() {
   static int pos = 0;
   int newPos = encoder.getPosition();
   if (pos != newPos) {
-    // show state on led
     if(newPos > pos) {
-      Serial.print("Right turn");
+      // "Right turn"
       digitalWrite(rightTurnPin, HIGH);
       digitalWrite(rightTurnPin, LOW);
+      Serial.println(99, DEC);
     } else {
-      Serial.print("Left turn");
+      // "Left turn"
       digitalWrite(leftTurnPin, HIGH);
       digitalWrite(leftTurnPin, LOW);  
+      Serial.println(66, DEC);
     }
-    
-    // print to serial
-    Serial.print(pos);
-    Serial.print(newPos);
-    Serial.println();
     pos = newPos;
   }
-} 
+}
 
