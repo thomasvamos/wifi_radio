@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #
 # Raspberry Pi Wifi Radio
 # 
@@ -27,7 +27,6 @@ class WifiRadio(object):
 
         # initialize serial port
         ser = serial.Serial('/dev/ttyAMA0', 9600, timeout=1)
-        ser.open()
 
         self.gpioInit()
 
@@ -62,7 +61,7 @@ class WifiRadio(object):
         try:
             while 1:
                 response = ser.readline().strip()
-                print repr(response)
+                #print repr(response)
                 if response == "66":
                     print "menu left"
                     self.isr_menu_left(0)
@@ -102,5 +101,8 @@ class WifiRadio(object):
     def isr_menu_press(self, channel):
         print "Menu button pressed"
 
-if __name__ == '__main__':
-    radio = WifiRadio()
+#if __name__ == '__main__':
+#    radio = WifiRadio()
+
+print "Starting wifi radio..."
+WifiRadio()

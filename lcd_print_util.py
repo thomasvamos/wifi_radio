@@ -66,7 +66,7 @@ class LCDPrintUtil(threading.Thread):
 
   def setCurrentStation(self, currentStationName):
     print "Setting current station to: " + currentStationName
-    self.currentStationName = currentStationName
+    self.currentStationName = " " + currentStationName + " "
     if(len(currentStationName) >= LCDPrintUtil.lineDigits):
       self.shiftRequired = True
     else:

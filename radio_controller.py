@@ -33,8 +33,8 @@ class RadioController(threading.Thread):
     self.lcdPrintUtil.start()
 
     #print current station name
-    self.currentStationName = self.mpc.getName()
-    self.lcdPrintUtil.setCurrentStation(self.currentStationName)
+    #self.currentStationName = self.mpc.getName()
+    #self.lcdPrintUtil.setCurrentStation(self.currentStationName)
 
     #init = Init(self.mpc)
     #init.start()
