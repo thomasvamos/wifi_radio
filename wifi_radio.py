@@ -2,7 +2,7 @@
 #
 # Raspberry Pi Wifi Radio
 # 
-# Author : Thomas Pieronczyk
+# Author : Thomas Vamos
 # Site   : impierium.de
 # 
 # Date   : 14.09.2014
@@ -19,7 +19,6 @@ from time import sleep
 from Queue import Queue
 import signal
 import serial
-
 
 class WifiRadio(object):
 
@@ -39,17 +38,8 @@ class WifiRadio(object):
         # set up GPIOs as inputs.
 
         # set up press buttons
-        GPIO.setup(WRC.MENU_ROTARY_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.add_event_detect(WRC.MENU_ROTARY_BUTTON_PIN, GPIO.RISING, callback=self.isr_menu_press)  
-
         GPIO.setup(WRC.VOLUME_ROTARY_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         GPIO.add_event_detect(WRC.VOLUME_ROTARY_BUTTON_PIN, GPIO.RISING, callback=self.isr_volume_press)  
-
-        # set up menu rotary encoder
-        GPIO.setup(WRC.MENU_ROTARY_LEFT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.setup(WRC.MENU_ROTARY_RIGHT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.add_event_detect(WRC.MENU_ROTARY_LEFT_TURN_PIN, GPIO.RISING, callback=self.isr_menu_left)  
-        GPIO.add_event_detect(WRC.MENU_ROTARY_RIGHT_TURN_PIN, GPIO.RISING, callback=self.isr_menu_right)  
 
         # set up volume rotary encoder
         GPIO.setup(WRC.VOLUME_ROTARY_LEFT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
@@ -57,17 +47,20 @@ class WifiRadio(object):
         GPIO.add_event_detect(WRC.VOLUME_ROTARY_LEFT_TURN_PIN, GPIO.RISING, callback=self.isr_volume_left)  
         GPIO.add_event_detect(WRC.VOLUME_ROTARY_RIGHT_TURN_PIN, GPIO.RISING, callback=self.isr_volume_right)  
 
+        GPIO.setup(WRC.SHUTDOWN_INPUT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.add_event_detect(WRC.SHUTDOWN_INPUT, GPIO.FALLING, callback=self.shutdown)
+        
         # pause thread
         try:
             while 1:
                 response = ser.readline().strip()
                 #print repr(response)
                 if response == "66":
-                    print "menu left"
-                    self.isr_menu_left(0)
-                elif response == "99":
                     print "menu right"
                     self.isr_menu_right(0)
+                elif response == "99":
+                    print "menu left"
+                    self.isr_menu_left(0)
                 elif response == "15":
                     print "menu press"
                     self.isr_menu_press(0)
@@ -89,6 +82,7 @@ class WifiRadio(object):
 
     def isr_volume_press(self, channel):
         print "Volume button pressed"
+        self.msgQueue.put(WRC.VOLUME_PRESSED_MSG)
 
     def isr_menu_left(self, channel):
         print "Menu turn left"
@@ -101,8 +95,9 @@ class WifiRadio(object):
     def isr_menu_press(self, channel):
         print "Menu button pressed"
 
-#if __name__ == '__main__':
-#    radio = WifiRadio()
+    def shutdown(self, channel):
+        print "Shutdown..."
+        self.msgQueue.put(WRC.SHUTDOWN_MSG)
 
 print "Starting wifi radio..."
 WifiRadio()

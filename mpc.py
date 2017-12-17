@@ -44,7 +44,7 @@ class MusicPlayerController(object):
   def stop(self):
     self.client.stop()   
 
-  def toggle(self):
+  def pause(self):
     self.client.pause()
 
   def getVolume(self):

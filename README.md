@@ -49,9 +49,20 @@ source: http://blog.scphillips.com/posts/2013/07/getting-a-python-script-to-run-
 # Configure USB Soundcard
 https://computers.tutsplus.com/articles/using-a-usb-audio-device-with-a-raspberry-pi--mac-55876
 
+# Set PIN low on Shutdown (to cut off external power supply)
+Add following line to /boot/config.txt:
+dtoverlay=gpio-poweroff,gpiopin=17,active_low=1
+
+Control relay with gpio pin
+http://www.susa.net/wordpress/2012/06/raspberry-pi-relay-using-gpio/
+
+Relay Shutoff Delay
+http://www.rbg.ul.schule-bw.de/elektronik/ausschaltverzoegerung.htm
+
 # TODO:
 * Read configs from file
 
 # Possible Improvements
+* Optimize audio (remove clicking from operations)
 * Using mpdlcd: https://github.com/rbarrois/mpdlcd
 * Optimize Startup Speed

@@ -3,10 +3,13 @@
 from wifi_radio_constants import WifiRadioConstants as WRC
 import threading
 import time
+import sys
 from wifi_radio_constants import WifiRadioConstants
 from mpc import MusicPlayerController
 from lcd import CharLCD
 from lcd_print_util import LCDPrintUtil
+import os
+from time import sleep
 
 class RadioController(threading.Thread):
 
@@ -32,24 +35,20 @@ class RadioController(threading.Thread):
     self.lcdPrintUtil = LCDPrintUtil(self.lcd, nameShiftEnabled=True)
     self.lcdPrintUtil.start()
 
-    #print current station name
-    #self.currentStationName = self.mpc.getName()
-    #self.lcdPrintUtil.setCurrentStation(self.currentStationName)
-
-    #init = Init(self.mpc)
-    #init.start()
-
   def run(self):
     self.running = True
     while self.running:
-      if not self.queue.empty():
-        item = self.queue.get()
-        print "Handling incoming message" + str(item)
-        self.handleMsg(item)
+      try:
+        if not self.queue.empty():
+          item = self.queue.get()
+          print "Handling incoming message " + str(item)
+          self.handleMsg(item)
 
-      if not self.currentStationName:
-        self.currentStationName = self.mpc.getName()
-        self.lcdPrintUtil.setCurrentStation(self.currentStationName)
+        if not self.currentStationName:
+          self.currentStationName = self.mpc.getName()
+          self.lcdPrintUtil.setCurrentStation(self.currentStationName)
+      except:
+        print "Unexpected error: ", sys.exc_info()[0]
 
     print "Stopped lcd control thread"
 
@@ -63,6 +62,10 @@ class RadioController(threading.Thread):
       self.handleVolumeLeftTurn()
     elif item == WRC.VOLUME_RIGHT_TURN_MSG:
       self.handleVolumeRightTurn()
+    elif item == WRC.VOLUME_PRESSED_MSG:
+      self.handleVolumePress()
+    elif item == WRC.SHUTDOWN_MSG:
+      self.handleShutdown()
     else:
       print "DEFAULT"
       self.lcdPrintUtil.printCurrentStation()
@@ -86,6 +89,18 @@ class RadioController(threading.Thread):
   def handleVolumeRightTurn(self):
     self.lcdPrintUtil.printVolumeUp()
     self.mpc.increaseVolume()
+
+  def handleVolumePress(self):
+    print "handlevolumepress"
+    self.lcdPrintUtil.printPause()
+    self.mpc.pause()
+
+  def handleShutdown(self):
+    self.lcdPrintUtil.printGoodbye()
+    sleep(1)
+    self.mpc.stop()
+    os.system("sudo shutdown -h now")
+
 
 
 

@@ -23,6 +23,8 @@ class LCDPrintUtil(threading.Thread):
   nextStationMsg =      "=====================   > Next     >   ==   > Station  >   ====================="
   previousStationMsg =  "=====================   < Previous <   ==   < Station  <   ====================="
   errorMsg =            "=====================       Error      ==     Occured      ====================="
+  goodbyeMsg =          "=====================     Goodbye      ==       ...        ====================="
+  pauseMsg =            "=====================     Paused       ==     Playback     ====================="
 
   def __init__(self, lcd, nameShiftEnabled=False):
     
@@ -55,7 +57,7 @@ class LCDPrintUtil(threading.Thread):
         self.printCurrentStation()
 
       self.printScreen()
-      sleep(0.1)    
+      sleep(0.5)    
 
   def printScreen(self):
     self.lcd.writeMessage(self.displayContent)
@@ -115,7 +117,6 @@ class LCDPrintUtil(threading.Thread):
     self.displayContent = LCDPrintUtil.nextStationMsg
     self.setAwaitingScreenReset()
     
-
   def printPreviousStation(self):
     self.displayContent = LCDPrintUtil.previousStationMsg
     self.setAwaitingScreenReset()
@@ -128,10 +129,18 @@ class LCDPrintUtil(threading.Thread):
     self.displayContent = LCDPrintUtil.volumeDownMsg
     self.setAwaitingScreenReset()
 
+  def printPause(self):
+    self.displayContent = LCDPrintUtil.pauseMsg
+    self.setAwaitingScreenReset()
+
   def printLoadingMsg(self):
     self.displayContent = LCDPrintUtil.laodingMsg
     self.setAwaitingScreenReset()
 
   def printErrorMessage(self, error):
     self.displayContent = LCDPrintUtil.errorMsg
+    self.setAwaitingScreenReset()
+
+  def printGoodbye(self):
+    self.displayContent = LCDPrintUtil.goodbyeMsg
     self.setAwaitingScreenReset()
