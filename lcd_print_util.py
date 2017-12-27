@@ -4,75 +4,64 @@ import threading
 from time import sleep
 from date_time_util import DateTimeUtil
 from threading import Timer
+from RPLCD import CharLCD
+import RPi.GPIO as GPIO
+from wifi_radio_constants import WifiRadioConstants as WRC
 
 class LCDPrintUtil(threading.Thread):
 
   timeToReturnToCurrentStation = 10.0
   
   #display sizes
-  lineDigits = 20
+  cols = 20
+  rows = 4
 
   # display messages
   lineFrameMsg =        "===================="
   lineEmptyMsg =        "                    "
   lineNoStationName =   "   Unkown Station   "
-  welcomeMsg =          "=====================   Raspberry PI   ==    Wifi Radio    ====================="
-  laodingMsg =          "=====================      Loading     ==       ...        ====================="
-  volumeUpMsg =         "=====================     Volume       ==        Up        ====================="
-  volumeDownMsg =       "=====================     Volume       ==       Down       ====================="
-  nextStationMsg =      "=====================   > Next     >   ==   > Station  >   ====================="
-  previousStationMsg =  "=====================   < Previous <   ==   < Station  <   ====================="
-  errorMsg =            "=====================       Error      ==     Occured      ====================="
-  goodbyeMsg =          "=====================     Goodbye      ==       ...        ====================="
-  pauseMsg =            "=====================     Paused       ==     Playback     ====================="
+  welcomeMsg =          ['====================','=   Raspberry PI   =','=    Wifi Radio    =','====================']
+  laodingMsg =          ['====================','=      Loading     =','=       ...        =','====================']
+  volumeUpMsg =         ['====================','=     Volume       =','=        Up        =','====================']
+  volumeDownMsg =       ['====================','=     Volume       =','=       Down       =','====================']
+  nextStationMsg =      ['====================','=   > Next     >   =','=   > Station  >   =','====================']
+  previousStationMsg =  ['====================','=   < Previous <   =','=   < Station  <   =','====================']
+  errorMsg =            ['====================','=       Error      =','=     Occured      =','====================']
+  goodbyeMsg =          ['====================','=     Goodbye      =','=       ...        =','====================']
+  pauseMsg =            ['====================','=     Paused       =','=     Playback     =','====================']
 
-  def __init__(self, lcd, nameShiftEnabled=False):
+  def __init__(self):
     
     threading.Thread.__init__(self)
     self.daemon = True
     self.running = True
 
-    self.lcd = lcd
+    self.displayContent = self.welcomeMsg
+
+    self.lcd = lcd = CharLCD( numbering_mode=GPIO.BCM,
+                              cols=LCDPrintUtil.cols,
+                              rows=LCDPrintUtil.rows,
+                              pin_rs=WRC.LCD_RS,
+                              pin_e=WRC.LCD_E,
+                              pins_data=[WRC.LCD_D4, WRC.LCD_D5, WRC.LCD_D6, WRC.LCD_D7]
+                            )
+
     self.dateTimeUtil = DateTimeUtil()
-    self.currentStationName = ""
-    self.nameShiftEnabled = nameShiftEnabled
-    self.shiftRequired = False
-    self.shiftIdx = 0
-    self.currentStationEnabled = True
-    self.displayContent = LCDPrintUtil.welcomeMsg
-    self.screenResetCtr = 10
-    self.awaitingScreenReset = False
-    self.setAwaitingScreenReset()
 
   def run(self):
     while self.running:
-      if self.awaitingScreenReset and self.screenResetCtr > 0:
-        self.screenResetCtr -= 1
-
-      if self.awaitingScreenReset and self.screenResetCtr == 0:
-        self.printCurrentStation()
-        self.awaitingScreenReset = False
-
-      if not self.awaitingScreenReset:
-        self.printCurrentStation()
-
-      self.printScreen()
+      self.printScreen(self.displayContent)
       sleep(0.5)    
 
-  def printScreen(self):
-    self.lcd.writeMessage(self.displayContent)
-
-  def setAwaitingScreenReset(self):
-    self.awaitingScreenReset = True
-    self.screenResetCtr = 10
+  def printScreen(self, framebuffer):
+    self.lcd.home()
+    for row in framebuffer:
+      self.lcd.write_string(row.ljust(self.cols)[:self.cols])
+      self.lcd.write_string('\r\n')
 
   def setCurrentStation(self, currentStationName):
     print "Setting current station to: " + currentStationName
     self.currentStationName = " " + currentStationName + " "
-    if(len(currentStationName) >= LCDPrintUtil.lineDigits):
-      self.shiftRequired = True
-    else:
-      self.shiftRequired = False
 
   def getCurrentStationNameWithShift(self, shift):
       startIdx = self.shiftIdx % len(self.currentStationName)
@@ -84,21 +73,14 @@ class LCDPrintUtil(threading.Thread):
 
   def printCurrentStation(self):
     name = self.fitNameToDisplayLine(self.currentStationName)
-
-    if(self.shiftRequired):
-      name = self.getCurrentStationNameWithShift(self.shiftIdx)
-      self.shiftIdx +=1
-      if self.shiftIdx >= len(self.currentStationName):
-        self.shiftIdx = 0
-
     dateTime = " " + self.dateTimeUtil.getTime() + " " + self.dateTimeUtil.getDate() + " "
-    self.displayContent = LCDPrintUtil.lineFrameMsg + name + dateTime + LCDPrintUtil.lineFrameMsg
+    self.displayContent = [LCDPrintUtil.lineFrameMsg,name,dateTime,LCDPrintUtil.lineFrameMsg]
 
   def fitNameToDisplayLine(self, name):
     if(len(name) <= 0):
       name = LCDPrintUtil.lineNoStationName
     
-    elif(len(name) > LCDPrintUtil.lineDigits):
+    elif(len(name) > LCDPrintUtil.cols):
       name = name[:17] + '...'
 
     else:
@@ -107,40 +89,44 @@ class LCDPrintUtil(threading.Thread):
 
   def centerNameInLine(self, name):
     if len(name) % 2 == 0:
-      noOfSpaces = (LCDPrintUtil.lineDigits - len(name)) / 2
+      noOfSpaces = (LCDPrintUtil.cols - len(name)) / 2
       return " " * noOfSpaces + name + " " * noOfSpaces
     else:
-      noOfSpaces = (LCDPrintUtil.lineDigits - len(name)-1) / 2
+      noOfSpaces = (LCDPrintUtil.cols - len(name)-1) / 2
       return " " * noOfSpaces + name + " " * (noOfSpaces + 1)
 
   def printNextStation(self):    
     self.displayContent = LCDPrintUtil.nextStationMsg
-    self.setAwaitingScreenReset()
     
   def printPreviousStation(self):
     self.displayContent = LCDPrintUtil.previousStationMsg
-    self.setAwaitingScreenReset()
 
   def printVolumeUp(self):
     self.displayContent = LCDPrintUtil.volumeUpMsg
-    self.setAwaitingScreenReset()
 
   def printVolumeDown(self):   
     self.displayContent = LCDPrintUtil.volumeDownMsg
-    self.setAwaitingScreenReset()
+
+  def printVolume(self, volume):
+    vol = self.centerNameInLine('Volume: ' + str(volume))
+    self.displayContent = [LCDPrintUtil.lineFrameMsg,vol,LCDPrintUtil.lineEmptyMsg,LCDPrintUtil.lineFrameMsg]
 
   def printPause(self):
     self.displayContent = LCDPrintUtil.pauseMsg
-    self.setAwaitingScreenReset()
 
   def printLoadingMsg(self):
     self.displayContent = LCDPrintUtil.laodingMsg
-    self.setAwaitingScreenReset()
 
   def printErrorMessage(self, error):
     self.displayContent = LCDPrintUtil.errorMsg
-    self.setAwaitingScreenReset()
 
   def printGoodbye(self):
     self.displayContent = LCDPrintUtil.goodbyeMsg
-    self.setAwaitingScreenReset()
+
+if __name__ == '__main__':
+  try:
+    lcd = LCDPrintUtil()
+    lcd.start()
+    lcd.join()
+  except KeyboardInterrupt:
+    print "exit"

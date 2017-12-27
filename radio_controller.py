@@ -20,19 +20,11 @@ class RadioController(threading.Thread):
     self.queue = queue
     self.currentStationName = ""
 
-    # init LCD Display
-    self.lcd = CharLCD( pin_rs = WRC.LCD_RS,
-            pin_e  = WRC.LCD_E,
-            pin_d4 = WRC.LCD_D4,
-            pin_d5 = WRC.LCD_D5,
-            pin_d6 = WRC.LCD_D6,
-            pin_d7 = WRC.LCD_D7)
-
     # init music player controller
     self.mpc = MusicPlayerController()
 
     # init lcd display
-    self.lcdPrintUtil = LCDPrintUtil(self.lcd, nameShiftEnabled=True)
+    self.lcdPrintUtil = LCDPrintUtil()
     self.lcdPrintUtil.start()
 
   def run(self):
@@ -83,12 +75,14 @@ class RadioController(threading.Thread):
     self.lcdPrintUtil.setCurrentStation(name)
 
   def handleVolumeLeftTurn(self):
-    self.lcdPrintUtil.printVolumeDown()
     self.mpc.decreaseVolume()
+    vol = self.mpc.getVolume()
+    self.lcdPrintUtil.printVolume(vol)
 
   def handleVolumeRightTurn(self):
-    self.lcdPrintUtil.printVolumeUp()
     self.mpc.increaseVolume()
+    vol = self.mpc.getVolume()
+    self.lcdPrintUtil.printVolume(vol)
 
   def handleVolumePress(self):
     print "handlevolumepress"

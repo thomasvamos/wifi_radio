@@ -15,12 +15,6 @@ $ sudo apt-get update
 $ sudo install gcc
 
 #### Install RPi.GPIO
-$ https://pypi.python.org/packages/e2/58/6e1b775606da6439fa3fd1550e7f714ac62aa75e162eed29dbec684ecb3e/RPi.GPIO-0.6.3.tar.gz
-$ tar zxf RPi.GPIO-0.6.3.tar.gz
-$ cd RPi.GPIO-0.6.3
-$ sudo python setup.py install
-
-### Install with pip
 $ sudo apt-get install python-pip 
 $ sudo pip install RPi.GPIO
 
@@ -38,11 +32,15 @@ Check [this](http://www.instructables.com/id/Read-and-write-from-serial-port-wit
 Check [this](http://www.hobbytronics.co.uk/raspberry-pi-serial-port) tutorial if you use debian
 
 # Starting wifi radio on boot
+## with init.d
 - make sure $HOME$/debian_init_script/wifi_radio.sh has unix file endings 
 - copy file  wifi_radio.sh to /etc/init.d
 - change paths in wifi_radio.sh to location to wifi_radio project
 - make file wifi_radio.sh executable
 - run $sudo update-rc.d wifi_radio.sh defaults (creates symbolic link to /etc/rc?.d)
+
+## with systemd
+https://www.raspberrypi-spy.co.uk/2015/10/how-to-autorun-a-python-script-on-boot-using-systemd/
 
 source: http://blog.scphillips.com/posts/2013/07/getting-a-python-script-to-run-in-the-background-as-a-service-on-boot/
 
@@ -61,6 +59,7 @@ http://www.rbg.ul.schule-bw.de/elektronik/ausschaltverzoegerung.htm
 
 # TODO:
 * Read configs from file
+* Disable DHCP and setup static IP Adress
 
 # Possible Improvements
 * Optimize audio (remove clicking from operations)
