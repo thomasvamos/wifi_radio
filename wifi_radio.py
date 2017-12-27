@@ -16,7 +16,6 @@ from wifi_radio_constants import WifiRadioConstants as WRC
 from radio_controller import RadioController
 import time
 from time import sleep
-from Queue import Queue
 import signal
 import serial
 
@@ -29,11 +28,7 @@ class WifiRadio(object):
 
         self.gpioInit()
 
-        # init queue for multithread communication
-        self.msgQueue = Queue()
-
-        self.radioController = RadioController(self.msgQueue)
-        self.radioController.start()
+        self.radioController = RadioController()
 
         # set up GPIOs as inputs.
 
@@ -74,30 +69,30 @@ class WifiRadio(object):
 
     def isr_volume_left(self, channel):
         print "Volume turn left"
-        self.msgQueue.put(WRC.VOLUME_LEFT_TURN_MSG)
+        self.radioController.handleVolumeLeftTurn()
 
     def isr_volume_right(self, channel):
         print "Volume turn right"
-        self.msgQueue.put(WRC.VOLUME_RIGHT_TURN_MSG)
+        self.radioController.handleVolumeRightTurn()
 
     def isr_volume_press(self, channel):
         print "Volume button pressed"
-        self.msgQueue.put(WRC.VOLUME_PRESSED_MSG)
+        self.radioController.handleVolumePress()
 
     def isr_menu_left(self, channel):
         print "Menu turn left"
-        self.msgQueue.put(WRC.MENU_LEFT_TURN_MSG)
+        self.radioController.handleMenuLeftTurn()
 
     def isr_menu_right(self, channel):
         print "Menu turn right"
-        self.msgQueue.put(WRC.MENU_RIGHT_TURN_MSG)
+        self.radioController.handleMenuRightTurn()
 
     def isr_menu_press(self, channel):
         print "Menu button pressed"
 
     def shutdown(self, channel):
         print "Shutdown..."
-        self.msgQueue.put(WRC.SHUTDOWN_MSG)
+        self.radioController.handleShutdown()
 
 print "Starting wifi radio..."
 WifiRadio()

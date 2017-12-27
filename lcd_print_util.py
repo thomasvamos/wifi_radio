@@ -7,6 +7,7 @@ from threading import Timer
 from RPLCD import CharLCD
 import RPi.GPIO as GPIO
 from wifi_radio_constants import WifiRadioConstants as WRC
+from Queue import Queue
 
 class LCDPrintUtil(threading.Thread):
 
@@ -30,11 +31,14 @@ class LCDPrintUtil(threading.Thread):
   goodbyeMsg =          ['====================','=     Goodbye      =','=       ...        =','====================']
   pauseMsg =            ['====================','=     Paused       =','=     Playback     =','====================']
 
-  def __init__(self):
+  def __init__(self, queue):
     
     threading.Thread.__init__(self)
     self.daemon = True
     self.running = True
+
+    self.queue = queue
+    self.currentStationName = 'Unkown Station'
 
     self.displayContent = self.welcomeMsg
 
@@ -50,8 +54,39 @@ class LCDPrintUtil(threading.Thread):
 
   def run(self):
     while self.running:
-      self.printScreen(self.displayContent)
-      sleep(0.5)    
+#      try:
+        if not self.queue.empty():
+          item = self.queue.get()
+          print "Handling incoming message " + str(item)
+          self.handleMsg(item)
+        else:
+          self.printCurrentStation()
+        self.printScreen(self.displayContent)
+        sleep(0.2)
+#      except:
+#        print "Unexpected error: ", sys.exc_info()[0]
+
+  def handleMsg(self, item):
+    print "Msg Item: " + str(item)
+    if item[0] == WRC.MENU_LEFT_TURN_MSG:
+      self.currentStationName = item[1]
+      self.setCurrentStation(self.currentStationName)
+      self.printPreviousStation()
+    elif item[0] == WRC.MENU_RIGHT_TURN_MSG:
+      self.currentStationName = item[1]
+      self.setCurrentStation(self.currentStationName)
+      self.printNextStation()
+    elif item[0] == WRC.VOLUME_LEFT_TURN_MSG:
+      self.printVolume(item[1])
+    elif item[0] == WRC.VOLUME_RIGHT_TURN_MSG:
+      self.printVolume(item[1])
+    elif item[0] == WRC.VOLUME_PRESSED_MSG:
+      self.printPause()
+    elif item[0] == WRC.SHUTDOWN_MSG:
+      self.printGoodbye()
+    else:
+      print "DEFAULT"
+      self.lcdPrintUtil.printCurrentStation()
 
   def printScreen(self, framebuffer):
     self.lcd.home()
