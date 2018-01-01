@@ -44,12 +44,14 @@ class WifiRadio(object):
 
         GPIO.setup(WRC.SHUTDOWN_INPUT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.add_event_detect(WRC.SHUTDOWN_INPUT, GPIO.FALLING, callback=self.shutdown)
+
+        self.tickInterval = 10
+        self.tickExecCounter = self.tickInterval
         
         # pause thread
         try:
             while 1:
                 response = ser.readline().strip()
-                #print repr(response)
                 if response == "66":
                     print "menu right"
                     self.isr_menu_right(0)
@@ -59,6 +61,16 @@ class WifiRadio(object):
                 elif response == "15":
                     print "menu press"
                     self.isr_menu_press(0)
+
+                self.radioController.tick()
+
+                # if self.tickExecCounter == 0:
+                #     print 'Tick!'   
+                #     self.tickExecCounter = self.tickInterval
+                #     self.radioController.tick()
+                # else:
+                #     print 'TickCount: ' + str(self.tickExecCounter)
+                #     self.tickExecCounter = self.tickExecCounter - 1
 
         except KeyboardInterrupt:
             ser.close()
