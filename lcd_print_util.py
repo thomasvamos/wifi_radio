@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from time import sleep
 from date_time_util import DateTimeUtil
-from RPLCD import CharLCD
+from lcd_thread import LCDThread
 import RPi.GPIO as GPIO
 from wifi_radio_constants import WifiRadioConstants as WRC
 from Queue import Queue
@@ -19,83 +19,74 @@ class LCDPrintUtil(object):
   lineFrameMsg =        '===================='
   lineEmptyMsg =        '                    '
   lineNoStationName =   '   Unkown Station   '
-  welcomeMsg =          ['====================','=   Raspberry PI   =','=    Wifi Radio    =','====================']
-  laodingMsg =          ['====================','=      Loading     =','=       ...        =','====================']
-  volumeUpMsg =         ['====================','=     Volume       =','=        Up        =','====================']
-  volumeDownMsg =       ['====================','=     Volume       =','=       Down       =','====================']
-  nextStationMsg =      ['====================','=   > Next     >   =','=   > Station  >   =','====================']
-  previousStationMsg =  ['====================','=   < Previous <   =','=   < Station  <   =','====================']
-  errorMsg =            ['====================','=       Error      =','=     Occured      =','====================']
-  goodbyeMsg =          ['====================','=     Goodbye      =','=       ...        =','====================']
-  pauseMsg =            ['====================','=     Paused       =','=     Playback     =','====================']
+  welcomeMsg =          '=====================   Raspberry PI   ==    Wifi Radio    ====================='
+  laodingMsg =          '=====================      Loading     ==       ...        ====================='
+  volumeUpMsg =         '=====================     Volume       ==        Up        ====================='
+  volumeDownMsg =       '=====================     Volume       ==       Down       ====================='
+  nextStationMsg =      '=====================   > Next     >   ==   > Station  >   ====================='
+  previousStationMsg =  '=====================   < Previous <   ==   < Station  <   ====================='
+  errorMsg =            '=====================       Error      ==     Occured      ====================='
+  goodbyeMsg =          '=====================     Goodbye      ==       ...        ====================='
+  pauseMsg =            '=====================     Paused       ==     Playback     ====================='
 
   def __init__(self):
     
     self.currentStationName = 'Unkown Station'
     self.displayResetInSeconds = 2
     self.displayContent = self.welcomeMsg
-
-    self.lcd = lcd = CharLCD( numbering_mode=GPIO.BCM,
-                              cols=LCDPrintUtil.cols,
-                              rows=LCDPrintUtil.rows,
-                              pin_rs=WRC.LCD_RS,
-                              pin_e=WRC.LCD_E,
-                              pins_data=[WRC.LCD_D4, WRC.LCD_D5, WRC.LCD_D6, WRC.LCD_D7]
-                            )
-
     self.dateTimeUtil = DateTimeUtil()
 
-  def printScreen(self, framebuffer, temporary):
-    self.lcd.home()
-    for row in framebuffer:
-      self.lcd.write_string(row.ljust(self.cols)[:self.cols])
-      self.lcd.write_string('\r\n')
+    self.queue = Queue()
+    self.lcdThread = LCDThread(self.queue) 
+    self.lcdThread.start()
 
+  def printScreen(self, framebuffer):
+    self.queue.put(self.displayContent)
+    
   def printCurrentStation(self):
-    print "printing current station"
     name = self.fitNameToDisplayLine(self.currentStationName)
     dateTime = " " + self.dateTimeUtil.getTime() + " " + self.dateTimeUtil.getDate() + " "
-    self.displayContent = [LCDPrintUtil.lineFrameMsg,name,dateTime,LCDPrintUtil.lineFrameMsg]
-    self.printScreen(self.displayContent, False)
+    self.displayContent = LCDPrintUtil.lineFrameMsg + name + str(dateTime) + LCDPrintUtil.lineFrameMsg
+    self.printScreen(self.displayContent)
 
   def printNextStation(self):    
     self.displayContent = LCDPrintUtil.nextStationMsg
-    self.printScreen(self.displayContent, True)
+    self.printScreen(self.displayContent)
     
     
   def printPreviousStation(self):
     self.displayContent = LCDPrintUtil.previousStationMsg
-    self.printScreen(self.displayContent, True)
+    self.printScreen(self.displayContent)
 
   def printVolumeUp(self):
     self.displayContent = LCDPrintUtil.volumeUpMsg
-    self.printScreen(self.displayContent, True)
+    self.printScreen(self.displayContent)
     
 
   def printVolumeDown(self):   
     self.displayContent = LCDPrintUtil.volumeDownMsg
-    self.printScreen(self.displayContent, True)
+    self.printScreen(self.displayContent)
 
   def printVolume(self, volume):
     vol = self.centerNameInLine('Volume: ' + str(volume))
-    self.displayContent = [LCDPrintUtil.lineFrameMsg,vol,LCDPrintUtil.lineEmptyMsg,LCDPrintUtil.lineFrameMsg]
-    self.printScreen(self.displayContent, True)
+    self.displayContent = LCDPrintUtil.lineFrameMsg + str(vol) + LCDPrintUtil.lineEmptyMsg + LCDPrintUtil.lineFrameMsg
+    self.printScreen(self.displayContent)
 
   def printPause(self):
     self.displayContent = LCDPrintUtil.pauseMsg
-    self.printScreen(self.displayContent, True)
+    self.printScreen(self.displayContent)
 
   def printLoadingMsg(self):
     self.displayContent = LCDPrintUtil.laodingMsg
-    self.printScreen(self.displayContent, True)
+    self.printScreen(self.displayContent)
 
   def printErrorMessage(self, error):
     self.displayContent = LCDPrintUtil.errorMsg
-    self.printScreen(self.displayContent, True)
+    self.printScreen(self.displayContent)
 
   def printGoodbye(self):
     self.displayContent = LCDPrintUtil.goodbyeMsg
-    self.printScreen(self.displayContent, True)
+    self.printScreen(self.displayContent)
 
   def setCurrentStation(self, currentStationName):
     print "Setting current station to: " + currentStationName

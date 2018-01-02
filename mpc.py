@@ -11,18 +11,19 @@
 import subprocess
 import mpd
 from mpd import ConnectionError
+from lockable_mpdclient import LockableMPDClient
 
 class MusicPlayerController(object):
 
   currentStation = 0
   numberOfStations = 0
-  currentVolume = 0
 
   def __init__(self, quiet=False):
-    self.quiet = quiet    
+    self.quiet = quiet
+    self.lastKnownVolume = 0
 
-    self.client = mpd.MPDClient(use_unicode=True)
-    try:
+    self.client = LockableMPDClient(use_unicode=True)
+    try:  
       self.client.connect("localhost", 6600)
     except SocketError:
       print "Couldn't connect to mpd."
@@ -33,41 +34,67 @@ class MusicPlayerController(object):
     self.play(0)
 
   def clearPlaylist(self):
-    self.client.clear()
+    with self.client:
+      self.client.clear()
 
   def addStream(self, url):
-    self.client.add(url)
+    print 'adding stream...'
+    with self.client:
+      self.client.add(url)
+    print 'finished adding stream.'
 
-  def play(self, entry=0):    
-    self.client.play(entry)
+  def play(self, entry=0):
+    print 'Playing entry: ' + str(entry)
+    with self.client:
+      self.client.play(entry)
+    print 'Set station to entry' + str(entry)
 
   def stop(self):
-    self.client.stop()   
+    with self.client:
+      self.client.stop()   
 
   def pause(self):
-    self.client.pause()
+    with self.client:
+      self.client.pause()
 
   def getVolume(self):
-    status = self.client.status()
+    print 'getting volume...'
+    with self.client:
+      status = self.client.status()
+    print 'retrieved volume: ' + str(status['volume'])
     return int(status['volume'])
+
+
+    # if not status and not status['volume']:
+    #   return self.lastKnownVolume
+
+    # self.lastKnownVolume = int(status['volume'])
+    # return self.lastKnownVolume
 
   def increaseVolume(self):
     curVol = self.getVolume()
+
     if curVol == 100:
       return
-    self.client.setvol(curVol + 1)
+    
+    with self.client:
+      self.client.setvol(curVol + 1)
 
   def decreaseVolume(self):
     curVol = self.getVolume()
+
     if curVol == 0:
       return
-    self.client.setvol(curVol - 1)
+
+    with self.client:
+      self.client.setvol(curVol - 1)
 
   def playNextStation(self):
     if(self.currentStation+1 >= self.numberOfStations):
       self.currentStation = 0
     else:
       self.currentStation += 1
+    
     self.play(self.currentStation)
 
   def playPreviousStation(self):
@@ -75,11 +102,15 @@ class MusicPlayerController(object):
       self.currentStation = self.numberOfStations-1
     else:
       self.currentStation -=1
+ 
     self.play(self.currentStation)
 
   def getName(self):
+    print 'Getting name...'
     try:
-      result = self.client.currentsong()
+      with self.client:
+        result = self.client.currentsong()
+      print 'retrieved name.'
       return result["file"]
     except ConnectionError:
       print "MPDClient not connected"

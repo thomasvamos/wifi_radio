@@ -53,24 +53,13 @@ class WifiRadio(object):
             while 1:
                 response = ser.readline().strip()
                 if response == "66":
-                    print "menu right"
                     self.isr_menu_right(0)
                 elif response == "99":
-                    print "menu left"
                     self.isr_menu_left(0)
                 elif response == "15":
-                    print "menu press"
                     self.isr_menu_press(0)
 
                 self.radioController.tick()
-
-                # if self.tickExecCounter == 0:
-                #     print 'Tick!'   
-                #     self.tickExecCounter = self.tickInterval
-                #     self.radioController.tick()
-                # else:
-                #     print 'TickCount: ' + str(self.tickExecCounter)
-                #     self.tickExecCounter = self.tickExecCounter - 1
 
         except KeyboardInterrupt:
             ser.close()
@@ -80,31 +69,30 @@ class WifiRadio(object):
         GPIO.setmode(GPIO.BCM)
 
     def isr_volume_left(self, channel):
-        print "Volume turn left"
+        # print "Volume turn left"
         self.radioController.handleVolumeLeftTurn()
 
     def isr_volume_right(self, channel):
-        print "Volume turn right"
+        # print "Volume turn right"
         self.radioController.handleVolumeRightTurn()
 
     def isr_volume_press(self, channel):
-        print "Volume button pressed"
+        # print "Volume button pressed"
         self.radioController.handleVolumePress()
 
     def isr_menu_left(self, channel):
-        print "Menu turn left"
+        # print "Menu turn left"
         self.radioController.handleMenuLeftTurn()
 
     def isr_menu_right(self, channel):
-        print "Menu turn right"
+        # print "Menu turn right"
         self.radioController.handleMenuRightTurn()
 
     def isr_menu_press(self, channel):
         print "Menu button pressed"
 
     def shutdown(self, channel):
-        print "Shutdown..."
+        # print "Shutdown..."
         self.radioController.handleShutdown()
 
-print "Starting wifi radio..."
 WifiRadio()
