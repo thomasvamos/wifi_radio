@@ -53,7 +53,7 @@ class RadioController(object):
     self.lcdPrintUtil.printPause()
 
   def handleShutdown(self):
-    self.mpc.printGoodbye()
+    self.lcdPrintUtil.printGoodbye()
     sleep(1)
     self.mpc.stop()
     os.system("sudo shutdown -h now")
