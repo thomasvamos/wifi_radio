@@ -72,3 +72,4 @@ http://www.rbg.ul.schule-bw.de/elektronik/ausschaltverzoegerung.htm
 
 # Sources
 * [Start radio at boot](https://www.raspberrypi-spy.co.uk/2015/10/how-to-autorun-a-python-script-on-boot-using-systemd/)
+* [Zeitzone auf Debian einstellen](https://d0m.me/2008/07/21/debian-linux-zeitzone-und-uhr-umstellen-deutschlandgermany/)

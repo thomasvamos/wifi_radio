@@ -4,6 +4,10 @@
 # Wifi Radio install script #
 #############################
 
+# set correct timezone
+sudo echo "Europe/Berlin" > /etc/timezone
+sudo dpkg-reconfigure tzdata
+
 # update apt-get repository
 # apt-get update
 

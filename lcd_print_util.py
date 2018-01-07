@@ -53,12 +53,14 @@ class LCDPrintUtil(object):
     self.displayContent = title + name + LCDPrintUtil.lineEmptyMsg + str(dateTime) 
     self.printScreen(self.displayContent)
 
-  def printNextStation(self):    
+  def printNextStation(self):
+    self.shiftIdx = 0
     self.displayContent = LCDPrintUtil.nextStationMsg
     self.printScreen(self.displayContent)
     
     
   def printPreviousStation(self):
+    self.shiftIdx = 0
     self.displayContent = LCDPrintUtil.previousStationMsg
     self.printScreen(self.displayContent)
 
