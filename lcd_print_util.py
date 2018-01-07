@@ -9,8 +9,6 @@ from Queue import Queue
 
 class LCDPrintUtil(object):
 
-  timeToReturnToCurrentStation = 10.0
-  
   #display sizes
   cols = 20
   rows = 4
@@ -32,9 +30,10 @@ class LCDPrintUtil(object):
   def __init__(self):
     
     self.currentStationName = 'Unkown Station'
-    self.currentStationTitle = 'Unkoen Title'
-    self.displayResetInSeconds = 2
+    self.currentStationTitle = 'Unkown Title'
     self.displayContent = self.welcomeMsg
+    self.shiftIdx = 0
+
     self.dateTimeUtil = DateTimeUtil()
 
     self.queue = Queue()
@@ -45,8 +44,11 @@ class LCDPrintUtil(object):
     self.queue.put(self.displayContent)
     
   def printCurrentStation(self):
-    name = self.fitNameToDisplayLine(self.currentStationName)
-    title = self.fitNameToDisplayLine(self.currentStationTitle)
+    
+    name = self.getShiftedText(self.currentStationName)
+    title = self.getShiftedText(self.currentStationTitle)
+    self.shiftIdx = self.shiftIdx + 1
+
     dateTime = " " + self.dateTimeUtil.getTime() + " " + self.dateTimeUtil.getDate() + " "
     self.displayContent = title + name + LCDPrintUtil.lineEmptyMsg + str(dateTime) 
     self.printScreen(self.displayContent)
@@ -92,18 +94,24 @@ class LCDPrintUtil(object):
 
   def setCurrentStation(self, currentSong):
     if "file" in currentSong:
-      self.currentStationName = currentSong["file"]
+      if len(currentSong['file']) > LCDPrintUtil.cols:
+        self.currentStationName = currentSong['file'] + ' ## '
+      else:
+        self.currentStationName = currentSong['file']
 
     if "title" in currentSong:
-      self.currentStationTitle = currentSong["title"]
-
-  def getCurrentStationNameWithShift(self, shift):
-      startIdx = self.shiftIdx % len(self.currentStationName)
-      endIdx = (self.shiftIdx + LCDPrintUtil.lineDigits) % len(self.currentStationName)
-      if startIdx < endIdx:
-        return self.currentStationName[startIdx:endIdx]
+      if len(currentSong['title']) > LCDPrintUtil.cols:
+        self.currentStationTitle = currentSong['title'] + ' ## '
       else:
-        return self.currentStationName[startIdx:len(self.currentStationName)] + self.currentStationName[0:endIdx]
+        self.currentStationTitle = currentSong['title']
+
+  def getShiftedText(self, text):
+      startIdx = self.shiftIdx % len(text)
+      endIdx = (self.shiftIdx + LCDPrintUtil.cols) % len(text)
+      if startIdx < endIdx:
+        return text[startIdx:endIdx]
+      else:
+        return text[startIdx:len(text)] + text[0:endIdx]
 
   def fitNameToDisplayLine(self, name):
     if(len(name) <= 0):
