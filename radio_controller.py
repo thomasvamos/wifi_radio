@@ -23,21 +23,26 @@ class RadioController(object):
 
     # init lcd display
     self.lcdPrintUtil = LCDPrintUtil()
-    self.lcdPrintUtil.setCurrentStation(self.mpc.getName())
+    self.lcdPrintUtil.setCurrentStation(self.mpc.getCurrentSongInfo())
     self.lcdPrintUtil.printCurrentStation()
 
   def tick(self):
+    self.lcdPrintUtil.setCurrentStation(self.mpc.getCurrentSongInfo())
     self.lcdPrintUtil.printCurrentStation()
 
   def handleMenuLeftTurn(self):
     self.mpc.playPreviousStation()
-    name = self.mpc.getName()
+    name = self.mpc.getCurrentSongInfo()
+    self.lcdPrintUtil.setCurrentStation(name)
     self.lcdPrintUtil.printPreviousStation()
+    self.lcdPrintUtil.printCurrentStation()
 
   def handleMenuRightTurn(self):
     self.mpc.playNextStation()
-    name = self.mpc.getName()
+    name = self.mpc.getCurrentSongInfo()
+    self.lcdPrintUtil.setCurrentStation(name)
     self.lcdPrintUtil.printNextStation()
+    self.lcdPrintUtil.printCurrentStation()
 
   def handleVolumeLeftTurn(self):
     self.mpc.decreaseVolume()

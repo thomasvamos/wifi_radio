@@ -32,6 +32,7 @@ class LCDPrintUtil(object):
   def __init__(self):
     
     self.currentStationName = 'Unkown Station'
+    self.currentStationTitle = 'Unkoen Title'
     self.displayResetInSeconds = 2
     self.displayContent = self.welcomeMsg
     self.dateTimeUtil = DateTimeUtil()
@@ -45,8 +46,9 @@ class LCDPrintUtil(object):
     
   def printCurrentStation(self):
     name = self.fitNameToDisplayLine(self.currentStationName)
+    title = self.fitNameToDisplayLine(self.currentStationTitle)
     dateTime = " " + self.dateTimeUtil.getTime() + " " + self.dateTimeUtil.getDate() + " "
-    self.displayContent = LCDPrintUtil.lineFrameMsg + name + str(dateTime) + LCDPrintUtil.lineFrameMsg
+    self.displayContent = title + name + LCDPrintUtil.lineEmptyMsg + str(dateTime) 
     self.printScreen(self.displayContent)
 
   def printNextStation(self):    
@@ -88,9 +90,12 @@ class LCDPrintUtil(object):
     self.displayContent = LCDPrintUtil.goodbyeMsg
     self.printScreen(self.displayContent)
 
-  def setCurrentStation(self, currentStationName):
-    print "Setting current station to: " + currentStationName
-    self.currentStationName = " " + currentStationName + " "
+  def setCurrentStation(self, currentSong):
+    if "file" in currentSong:
+      self.currentStationName = currentSong["file"]
+
+    if "title" in currentSong:
+      self.currentStationTitle = currentSong["title"]
 
   def getCurrentStationNameWithShift(self, shift):
       startIdx = self.shiftIdx % len(self.currentStationName)

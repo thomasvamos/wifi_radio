@@ -106,13 +106,12 @@ class MusicPlayerController(object):
  
     self.play(self.currentStation)
 
-  def getName(self):
-    print 'Getting name...'
+  def getCurrentSongInfo(self):
     try:
       with self.client:
         result = self.client.currentsong()
-      print 'retrieved name.'
-      return result["file"]
+
+      return result
     except ConnectionError:
       print "MPDClient not connected"
       return "Unknown"
