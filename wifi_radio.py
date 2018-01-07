@@ -18,32 +18,21 @@ import time
 from time import sleep
 import signal
 import serial
+import logging
+import configuration as cfg
 
 class WifiRadio(object):
 
     def __init__(self):
 
+        self.initLogger()
+
         # initialize serial port
         ser = serial.Serial('/dev/ttyAMA0', 9600, timeout=1)
 
-        self.gpioInit()
+        self.initGpio()
 
         self.radioController = RadioController()
-
-        # set up GPIOs as inputs.
-
-        # set up press buttons
-        GPIO.setup(WRC.VOLUME_ROTARY_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.add_event_detect(WRC.VOLUME_ROTARY_BUTTON_PIN, GPIO.RISING, callback=self.isr_volume_press)  
-
-        # set up volume rotary encoder
-        GPIO.setup(WRC.VOLUME_ROTARY_LEFT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.setup(WRC.VOLUME_ROTARY_RIGHT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        GPIO.add_event_detect(WRC.VOLUME_ROTARY_LEFT_TURN_PIN, GPIO.RISING, callback=self.isr_volume_left)  
-        GPIO.add_event_detect(WRC.VOLUME_ROTARY_RIGHT_TURN_PIN, GPIO.RISING, callback=self.isr_volume_right)  
-
-        GPIO.setup(WRC.SHUTDOWN_INPUT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.add_event_detect(WRC.SHUTDOWN_INPUT, GPIO.FALLING, callback=self.shutdown)
 
         self.tickInterval = 10
         self.tickExecCounter = self.tickInterval
@@ -64,9 +53,27 @@ class WifiRadio(object):
         except KeyboardInterrupt:
             ser.close()
 
-    def gpioInit(self):
+    def initLogger(self):
+        logging.basicConfig(filename=cfg.log_file,level=logging.DEBUG)
+
+    def initGpio(self):
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
+
+        # set up GPIOs as inputs.
+
+        # set up press buttons
+        GPIO.setup(WRC.VOLUME_ROTARY_BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.add_event_detect(WRC.VOLUME_ROTARY_BUTTON_PIN, GPIO.RISING, callback=self.isr_volume_press)  
+
+        # set up volume rotary encoder
+        GPIO.setup(WRC.VOLUME_ROTARY_LEFT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(WRC.VOLUME_ROTARY_RIGHT_TURN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.add_event_detect(WRC.VOLUME_ROTARY_LEFT_TURN_PIN, GPIO.RISING, callback=self.isr_volume_left)  
+        GPIO.add_event_detect(WRC.VOLUME_ROTARY_RIGHT_TURN_PIN, GPIO.RISING, callback=self.isr_volume_right)  
+
+        GPIO.setup(WRC.SHUTDOWN_INPUT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.add_event_detect(WRC.SHUTDOWN_INPUT, GPIO.FALLING, callback=self.shutdown)
 
     def isr_volume_left(self, channel):
         # print "Volume turn left"

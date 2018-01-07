@@ -12,6 +12,7 @@ import subprocess
 import mpd
 from mpd import ConnectionError
 from lockable_mpdclient import LockableMPDClient
+import configuration as cfg
 
 class MusicPlayerController(object):
 
@@ -30,7 +31,7 @@ class MusicPlayerController(object):
       exit(1)
 
     self.clearPlaylist()
-    self.loadPlaylist("playlist.m3u")
+    self.loadPlaylist(cfg.playlist_file)
     self.play(0)
 
   def clearPlaylist(self):
@@ -118,7 +119,11 @@ class MusicPlayerController(object):
 
   def loadPlaylist(self, path):
     self.numberOfStations = 0
-    f = open(path, 'r')
+    try:
+      f = open(path, 'r')
+    except IOError, e:
+      print str(e)
+
     for line in f:
       print "Adding " + line + " as playlist."
       self.addStream(line.rstrip())

@@ -1,3 +1,6 @@
+# Raspberry-PI Wifi-Radio
+My attempt to build a retro wifi radio from scratch using a raspberry pi
+
 IP: 192.168.1.19
 ssh user: pi/pi
 
@@ -60,8 +63,12 @@ http://www.rbg.ul.schule-bw.de/elektronik/ausschaltverzoegerung.htm
 # TODO:
 * Read configs from file
 * Disable DHCP and setup static IP Adress
+* Play last played station
+* Select station from menu
 
 # Possible Improvements
-* Optimize audio (remove clicking from operations)
 * Using mpdlcd: https://github.com/rbarrois/mpdlcd
 * Optimize Startup Speed
+
+# Sources
+* [Start radio at boot](https://www.raspberrypi-spy.co.uk/2015/10/how-to-autorun-a-python-script-on-boot-using-systemd/)

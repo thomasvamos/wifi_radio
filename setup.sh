@@ -18,16 +18,8 @@
 
 # start wifi_radio on boot
 echo "registering wifi radio as a init.d service"
-cp -f ./install/wifi_radio.service /lib/systemd/system/wifi_radio.service
+cp -f ./setup/wifi_radio.service /lib/systemd/system/wifi_radio.service
 sudo chmod 644 /lib/systemd/system/wifi_radio.service
 
 sudo systemctl daemon-reload
 sudo systemctl enable wifi_radio.service
-
-# legacy
-# cp wifi_radio.sh /etc/init.d/
-# chmod +x /etc/init.d/wifi_radio.sh
-# update-rc.d wifi_radio.sh defaults
-
-
-

@@ -11,12 +11,13 @@ from lcd_print_util import LCDPrintUtil
 import os
 from time import sleep
 from Queue import Queue
+import logging
+
 
 class RadioController(object):
 
   def __init__(self):
     
-
     # init music player controller
     self.mpc = MusicPlayerController()
 

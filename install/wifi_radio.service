@@ -1,0 +1,11 @@
+[Unit]
+Description=Thomas Vamos Wifi Radio
+After=multi-user.target
+
+[Service]
+Type=idle
+User=root
+ExecStart=/usr/bin/python /home/volumio/wifi_radio/wifi_radio.py > /var/log/wifi_radio.log 2>&1
+
+[Install]
+WantedBy=multi-user.target
