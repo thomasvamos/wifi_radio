@@ -91,6 +91,9 @@ class LCDPrintUtil(object):
     self.printScreen(self.displayContent)
 
   def printGoodbye(self):
+    if not self.queue.empty():
+      with self.queue.mutex:
+        self.queue.queue.clear()
     self.displayContent = LCDPrintUtil.goodbyeMsg
     self.printScreen(self.displayContent)
 

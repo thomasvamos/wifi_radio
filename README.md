@@ -34,18 +34,6 @@ The Serial Login Screen has to be disabled to use the serial ports for communica
 Check [this](http://www.instructables.com/id/Read-and-write-from-serial-port-with-Raspberry-Pi/) tutorial if you use raspbian
 Check [this](http://www.hobbytronics.co.uk/raspberry-pi-serial-port) tutorial if you use debian
 
-# Starting wifi radio on boot
-## with init.d
-- make sure $HOME$/debian_init_script/wifi_radio.sh has unix file endings 
-- copy file  wifi_radio.sh to /etc/init.d
-- change paths in wifi_radio.sh to location to wifi_radio project
-- make file wifi_radio.sh executable
-- run $sudo update-rc.d wifi_radio.sh defaults (creates symbolic link to /etc/rc?.d)
-
-## with systemd
-https://www.raspberrypi-spy.co.uk/2015/10/how-to-autorun-a-python-script-on-boot-using-systemd/
-
-source: http://blog.scphillips.com/posts/2013/07/getting-a-python-script-to-run-in-the-background-as-a-service-on-boot/
 
 # Configure USB Soundcard
 https://computers.tutsplus.com/articles/using-a-usb-audio-device-with-a-raspberry-pi--mac-55876
@@ -73,3 +61,4 @@ http://www.rbg.ul.schule-bw.de/elektronik/ausschaltverzoegerung.htm
 # Sources
 * [Start radio at boot](https://www.raspberrypi-spy.co.uk/2015/10/how-to-autorun-a-python-script-on-boot-using-systemd/)
 * [Zeitzone auf Debian einstellen](https://d0m.me/2008/07/21/debian-linux-zeitzone-und-uhr-umstellen-deutschlandgermany/)
+* [USB Soundcard Configuration](https://computers.tutsplus.com/articles/using-a-usb-audio-device-with-a-raspberry-pi--mac-55876)
