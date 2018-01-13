@@ -33,9 +33,8 @@ class LCDPrintUtil(object):
     self.currentStationTitle = 'Unkown Title'
     self.displayContent = self.welcomeMsg
     self.shiftIdx = 0
-
+    self.shift = False
     self.dateTimeUtil = DateTimeUtil()
-
     self.queue = Queue()
     self.lcdThread = LCDThread(self.queue) 
     self.lcdThread.start()
@@ -44,10 +43,13 @@ class LCDPrintUtil(object):
     self.queue.put(self.displayContent)
     
   def printCurrentStation(self):
-    
-    name = self.getShiftedText(self.currentStationName)
-    title = self.getShiftedText(self.currentStationTitle)
-    self.shiftIdx = self.shiftIdx + 1
+    if self.shift:
+      name = self.getShiftedText(self.currentStationName)
+      title = self.getShiftedText(self.currentStationTitle)
+      self.shiftIdx = self.shiftIdx + 1
+    else:
+      name = self.fitNameToDisplayLine(self.currentStationName)
+      name = self.fitNameToDisplayLine(self.currentStationTitle)
 
     dateTime = " " + self.dateTimeUtil.getTime() + " " + self.dateTimeUtil.getDate() + " "
     self.displayContent = title + name + LCDPrintUtil.lineEmptyMsg + str(dateTime) 
@@ -58,11 +60,14 @@ class LCDPrintUtil(object):
     self.displayContent = LCDPrintUtil.nextStationMsg
     self.printScreen(self.displayContent)
     
-    
   def printPreviousStation(self):
     self.shiftIdx = 0
     self.displayContent = LCDPrintUtil.previousStationMsg
     self.printScreen(self.displayContent)
+
+    
+  def printStationList(self, stations, index):
+    self.displayContent = "Station List"
 
   def printVolumeUp(self):
     self.displayContent = LCDPrintUtil.volumeUpMsg
@@ -109,6 +114,12 @@ class LCDPrintUtil(object):
         self.currentStationTitle = currentSong['title'] + ' ## '
       else:
         self.currentStationTitle = currentSong['title']
+
+    if (len(currentSong['file']) > LCDPrintUtil.cols) or \
+    (len(currentSong['title']) > LCDPrintUtil.cols):
+      self.shift = True
+    else:
+      self.shift = False
 
   def getShiftedText(self, text):
       startIdx = self.shiftIdx % len(text)

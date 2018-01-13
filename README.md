@@ -48,11 +48,22 @@ http://www.susa.net/wordpress/2012/06/raspberry-pi-relay-using-gpio/
 Relay Shutoff Delay
 http://www.rbg.ul.schule-bw.de/elektronik/ausschaltverzoegerung.htm
 
+# Bugs:
+* Unpause prints "Pause"
+
 # TODO:
 * Read configs from file
 * Disable DHCP and setup static IP Adress
 * Play last played station
 * Select station from menu
+* Structure project according to best practices
+* Install and Uninstall scripts for debian
+
+# TODO [solved] (Features):
+* Playback using mpd
+* Output over USB Soundcard
+* Startup Radio on Boot (systemd service)
+
 
 # Possible Improvements
 * Using mpdlcd: https://github.com/rbarrois/mpdlcd

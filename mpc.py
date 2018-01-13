@@ -34,16 +34,10 @@ class MusicPlayerController(object):
     self.loadPlaylist(cfg.playlist_file)
     self.play(0)
 
-  def clearPlaylist(self):
-    with self.client:
-      self.client.clear()
-
-  def addStream(self, url):
-    print 'adding stream...'
-    with self.client:
-      self.client.add(url)
-    print 'finished adding stream.'
-
+  
+  '''
+  Playback
+  '''
   def play(self, entry=0):
     print 'Playing entry: ' + str(entry)
     with self.client:
@@ -116,19 +110,34 @@ class MusicPlayerController(object):
       print "MPDClient not connected"
       return "Unknown"
 
+  '''
+  Playlist management
+  '''
+
+  def clearPlaylist(self):
+    with self.client:
+      self.client.clear()
+
+  def addStream(self, url):
+    print 'adding stream...'
+    with self.client:
+      self.client.add(url)
+    print 'finished adding stream.'
+
   def loadPlaylist(self, path):
     self.numberOfStations = 0
     try:
       f = open(path, 'r')
+      for line in f:
+        print "Adding " + line + " as playlist."
+        self.addStream(line.rstrip())
+        self.numberOfStations += 1
+      print "Total number of playlist entries: " + str(self.numberOfStations)
+      f.close()
     except IOError, e:
       print str(e)
 
-    for line in f:
-      print "Adding " + line + " as playlist."
-      self.addStream(line.rstrip())
-      self.numberOfStations += 1
-    print "Total number of playlist entries: " + str(self.numberOfStations)
-    f.close()
+    
 
 
 

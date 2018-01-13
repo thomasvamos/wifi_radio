@@ -96,7 +96,7 @@ class WifiRadio(object):
         self.radioController.handleMenuRightTurn()
 
     def isr_menu_press(self, channel):
-        print "Menu button pressed"
+        self.radioController.handleMenuPress()
 
     def shutdown(self, channel):
         # print "Shutdown..."

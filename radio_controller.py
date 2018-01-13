@@ -44,6 +44,9 @@ class RadioController(object):
     self.lcdPrintUtil.printNextStation()
     self.lcdPrintUtil.printCurrentStation()
 
+  def handleMenuPress(self):
+    pass
+    
   def handleVolumeLeftTurn(self):
     self.mpc.decreaseVolume()
     vol = self.mpc.getVolume()
