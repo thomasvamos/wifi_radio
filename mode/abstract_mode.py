@@ -1,11 +1,15 @@
 from abc import ABCMeta, abstractmethod
 
 class AbstractMode:
-    __metaclass__ = ABCMeta
+  __metaclass__ = ABCMeta
 
-  def __init__(self, lcd, mpc):
-    this.lcd = lcd
-    this.mpc = mpc
+  def __init__(self, lcd, mpc, funcSwitchMode):
+    self.lcd = lcd
+    self.mpc = mpc
+    self.switchMode = funcSwitchMode
+
+  def switchMode(mode):
+    self.switchMode(mode)
 
   @abstractmethod
   def tick(self):

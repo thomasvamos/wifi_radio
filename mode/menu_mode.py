@@ -1,32 +1,31 @@
+from abstract_mode import AbstractMode
+
 class MenuMode(AbstractMode):
 
-  def __init__(self, lcd, mpc):
-    super().__init__(lcd, mpc)
+  def __init__(self, lcd, mpc, funcSwitchMode):
+    super(MenuMode,self).__init__(lcd, mpc, funcSwitchMode)
 
-  @abstractmethod
+  def getName(self):
+    return 'MenuMode'
+
   def tick(self):
-    pass
+    self.lcd.printMenu()
 
-  @abstractmethod
   def handleMenuLeftTurn(self):
     pass
   
-  @abstractmethod
   def handleMenuRightTurn(self):
     pass
   
-  @abstractmethod
   def handleMenuPress(self):
     pass
+    # self.switchMode(PlaybackMode.__name__)
 
-  @abstractmethod
   def handleVolumeLeftTurn(self):
     pass
 
-  @abstractmethod
   def handleVolumeRightTurn(self):
     pass
 
-  @abstractmethod
   def handleVolumePress(self):
     pass

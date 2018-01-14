@@ -1,65 +1,53 @@
 #!/usr/bin/python
 
-from wifi_radio_constants import WifiRadioConstants as WRC
-import threading
-import time
-import sys
-from wifi_radio_constants import WifiRadioConstants
 from mpc import MusicPlayerController
-from lcd import CharLCD
 from lcd_print_util import LCDPrintUtil
 import os
 from time import sleep
-from Queue import Queue
-import logging
 
+from mode.playback_mode import PlaybackMode
+from mode.menu_mode import MenuMode
 
 class RadioController(object):
 
   def __init__(self):
-    
-    # init music player controller
-    self.mpc = MusicPlayerController()
-
-    # init lcd display
     self.lcd = LCDPrintUtil()
-    self.lcd.setCurrentStation(self.mpc.getCurrentSongInfo())
-    self.lcd.printCurrentStation()
+    self.mpc = MusicPlayerController()
+    self.modes = dict()
+    self.initModes()
+    self.switchMode(PlaybackMode.__name__)
+  
+  def switchMode(self, mode):
+    self.mode = self.modes[str(mode)]
+
+  def initModes(self):
+    playbackMode = PlaybackMode(self.lcd, self.mpc, self.switchMode)
+    menuMode = MenuMode(self.lcd, self.mpc, self.switchMode)
+
+    self.modes[str(PlaybackMode.__name__)] = playbackMode
+    self.modes[str(MenuMode.__name__)] = menuMode
+
 
   def tick(self):
-    self.lcd.setCurrentStation(self.mpc.getCurrentSongInfo())
-    self.lcd.printCurrentStation()
+    self.mode.tick()
 
   def handleMenuLeftTurn(self):
-    self.mpc.playPreviousStation()
-    name = self.mpc.getCurrentSongInfo()
-    self.lcd.setCurrentStation(name)
-    self.lcd.printPreviousStation()
-    self.lcd.printCurrentStation()
+    self.mode.handleMenuLeftTurn()
 
   def handleMenuRightTurn(self):
-    self.mpc.playNextStation()
-    name = self.mpc.getCurrentSongInfo()
-    self.lcd.setCurrentStation(name)
-    self.lcd.printNextStation()
-    self.lcd.printCurrentStation()
+    self.mode.handleMenuRightTurn()
 
   def handleMenuPress(self):
-    pass
-    
+    self.mode.handleMenuPress()
+
   def handleVolumeLeftTurn(self):
-    self.mpc.decreaseVolume()
-    vol = self.mpc.getVolume()
-    self.lcd.printVolume(vol)
+    self.mode.handleVolumeLeftTurn()
 
   def handleVolumeRightTurn(self):
-    self.mpc.increaseVolume()
-    vol = self.mpc.getVolume()
-    self.lcd.printVolume(vol)
+    self.mode.handleVolumeRightTurn()
 
   def handleVolumePress(self):
-    self.mpc.pause()
-    self.lcd.printPause()
+    self.mode.handleVolumePress()
 
   def handleShutdown(self):
     self.lcd.printGoodbye()

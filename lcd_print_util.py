@@ -72,7 +72,6 @@ class LCDPrintUtil(object):
   def printVolumeUp(self):
     self.displayContent = LCDPrintUtil.volumeUpMsg
     self.printScreen(self.displayContent)
-    
 
   def printVolumeDown(self):   
     self.displayContent = LCDPrintUtil.volumeDownMsg
@@ -80,7 +79,7 @@ class LCDPrintUtil(object):
 
   def printVolume(self, volume):
     vol = self.centerNameInLine('Volume: ' + str(volume))
-    self.displayContent = LCDPrintUtil.lineFrameMsg + str(vol) + LCDPrintUtil.lineEmptyMsg + LCDPrintUtil.lineFrameMsg
+    self.displayContent = LCDPrintUtil.lineFrameMsg + vol + LCDPrintUtil.lineEmptyMsg + LCDPrintUtil.lineFrameMsg
     self.printScreen(self.displayContent)
 
   def printPause(self):
@@ -93,6 +92,11 @@ class LCDPrintUtil(object):
 
   def printErrorMessage(self, error):
     self.displayContent = LCDPrintUtil.errorMsg
+    self.printScreen(self.displayContent)
+
+  def printMenu(self):
+    menu = self.centerNameInLine('!Menu!')
+    self.displayContent = LCDPrintUtil.lineFrameMsg + menu + LCDPrintUtil.lineEmptyMsg + LCDPrintUtil.lineFrameMsg
     self.printScreen(self.displayContent)
 
   def printGoodbye(self):

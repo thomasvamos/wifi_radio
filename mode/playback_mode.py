@@ -1,32 +1,44 @@
+from abstract_mode import AbstractMode
+from menu_mode import MenuMode
+
 class PlaybackMode(AbstractMode):
 
-  def __init__(self, lcd, mpc):
-    super().__init__(lcd, mpc)
-
-  @abstractmethod
+  def __init__(self, lcd, mpc, funcSwitchMode):
+    super(PlaybackMode,self).__init__(lcd, mpc,funcSwitchMode)
+    self.lcd.setCurrentStation(self.mpc.getCurrentSongInfo())
+    self.lcd.printCurrentStation()
+    
   def tick(self):
-    pass
+    self.lcd.setCurrentStation(self.mpc.getCurrentSongInfo())
+    self.lcd.printCurrentStation()
 
-  @abstractmethod
   def handleMenuLeftTurn(self):
-    pass
+    self.mpc.playPreviousStation()
+    name = self.mpc.getCurrentSongInfo()
+    self.lcd.setCurrentStation(name)
+    self.lcd.printPreviousStation()
+    self.lcd.printCurrentStation()
   
-  @abstractmethod
   def handleMenuRightTurn(self):
-    pass
+    self.mpc.playNextStation()
+    name = self.mpc.getCurrentSongInfo()
+    self.lcd.setCurrentStation(name)
+    self.lcd.printNextStation()
+    self.lcd.printCurrentStation()
   
-  @abstractmethod
-  def handleMenuPress(self):
-    pass
-
-  @abstractmethod
   def handleVolumeLeftTurn(self):
-    pass
+    self.mpc.decreaseVolume()
+    vol = self.mpc.getVolume()
+    self.lcd.printVolume(vol)
 
-  @abstractmethod
   def handleVolumeRightTurn(self):
-    pass
+    self.mpc.increaseVolume()
+    vol = self.mpc.getVolume()
+    self.lcd.printVolume(vol)
 
-  @abstractmethod
   def handleVolumePress(self):
-    pass
+    self.mpc.pause()
+    self.lcd.printPause()
+
+  def handleMenuPress(self):
+    self.switchMode(MenuMode.__name__)
