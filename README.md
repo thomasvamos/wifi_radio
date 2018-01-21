@@ -52,6 +52,7 @@ http://www.rbg.ul.schule-bw.de/elektronik/ausschaltverzoegerung.htm
 * Unpause prints "Pause"
 
 # TODO:
+* Block Input until stations are loaded
 * Optimize volume control (too slow)
 * Read configs from file
 * Disable DHCP and setup static IP Adress
