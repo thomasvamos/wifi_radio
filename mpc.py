@@ -18,6 +18,7 @@ class MusicPlayerController(object):
 
   currentStation = 0
   numberOfStations = 0
+  storedPlaylistName = 'wifi_radio_playlist'
 
   def __init__(self, quiet=False):
     self.quiet = quiet
@@ -30,8 +31,7 @@ class MusicPlayerController(object):
       print "Couldn't connect to mpd."
       exit(1)
 
-    self.clearPlaylist()
-    self.loadPlaylist(cfg.playlist_file)
+    self.updateStationList()
     self.play(0)
 
   
@@ -114,7 +114,29 @@ class MusicPlayerController(object):
   Playlist management
   '''
 
-  def clearPlaylist(self):
+  def updateStationList(self):
+    self.clearCurrentPlaylist()
+
+    playlists = self.getStoredPlaylists()
+    if any(item['playlist'] == self.storedPlaylistName for item in playlists):
+      self.deleteStoredPlaylist(self.storedPlaylistName)
+      
+    self.loadPlaylist(cfg.playlist_file)
+    self.savePlaylist(self.storedPlaylistName)
+
+  def getStoredPlaylists(self):
+    with self.client:
+      return self.client.listplaylists()
+
+  def deleteStoredPlaylist(self, name):
+    with self.client:
+      self.client.rm(name)
+
+  def savePlaylist(self, name):
+    with self.client:
+      self.client.save(name)
+
+  def clearCurrentPlaylist(self):
     with self.client:
       self.client.clear()
 
@@ -129,7 +151,7 @@ class MusicPlayerController(object):
     try:
       f = open(path, 'r')
       for line in f:
-        print "Adding " + line + " as playlist."
+        print "Adding " + line + " to playlist " + self.storedPlaylistName
         self.addStream(line.rstrip())
         self.numberOfStations += 1
       print "Total number of playlist entries: " + str(self.numberOfStations)
