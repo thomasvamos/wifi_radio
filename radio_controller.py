@@ -1,59 +1,35 @@
 #!/usr/bin/python
 
-from mpc import MusicPlayerController
-from lcd_print_util import LCDPrintUtil
-import os
-from time import sleep
-
-from mode.playback_mode import PlaybackMode
-from mode.menu_mode import MenuMode
+from mode.mode_selector import ModeSelector
 
 class RadioController(object):
 
   def __init__(self):
-    self.lcd = LCDPrintUtil()
-    self.mpc = MusicPlayerController()
-    self.modes = dict()
-    self.initModes()
-    self.switchMode(PlaybackMode.__name__)
-  
-  def switchMode(self, mode):
-    self.mode = self.modes[str(mode)]
-
-  def initModes(self):
-    playbackMode = PlaybackMode(self.lcd, self.mpc, self.switchMode)
-    menuMode = MenuMode(self.lcd, self.mpc, self.switchMode)
-
-    self.modes[str(PlaybackMode.__name__)] = playbackMode
-    self.modes[str(MenuMode.__name__)] = menuMode
-
+    self.modeSelector = ModeSelector()
 
   def tick(self):
-    self.mode.tick()
+    self.modeSelector.mode.tick()
 
   def handleMenuLeftTurn(self):
-    self.mode.handleMenuLeftTurn()
+    self.modeSelector.mode.handleMenuLeftTurn()
 
   def handleMenuRightTurn(self):
-    self.mode.handleMenuRightTurn()
+    self.modeSelector.mode.handleMenuRightTurn()
 
   def handleMenuPress(self):
-    self.mode.handleMenuPress()
+    self.modeSelector.mode.handleMenuPress()
 
   def handleVolumeLeftTurn(self):
-    self.mode.handleVolumeLeftTurn()
+    self.modeSelector.mode.handleVolumeLeftTurn()
 
   def handleVolumeRightTurn(self):
-    self.mode.handleVolumeRightTurn()
+    self.modeSelector.mode.handleVolumeRightTurn()
 
   def handleVolumePress(self):
-    self.mode.handleVolumePress()
+    self.modeSelector.mode.handleVolumePress()
 
   def handleShutdown(self):
-    self.lcd.printGoodbye()
-    sleep(1)
-    self.mpc.stop()
-    os.system("sudo shutdown -h now")
+    self.modeSelector.mode.handleShutdown()
 
 
 

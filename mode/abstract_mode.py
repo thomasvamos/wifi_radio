@@ -1,4 +1,8 @@
 from abc import ABCMeta, abstractmethod
+from mpc import MusicPlayerController
+from lcd_print_util import LCDPrintUtil
+import os
+from time import sleep
 
 class AbstractMode:
   __metaclass__ = ABCMeta
@@ -38,3 +42,9 @@ class AbstractMode:
   @abstractmethod
   def handleVolumePress(self):
     pass
+
+  def handleShutdown(self):
+    self.lcd.printGoodbye()
+    sleep(1)
+    self.mpc.stop()
+    os.system("sudo shutdown -h now")

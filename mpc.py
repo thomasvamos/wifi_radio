@@ -33,7 +33,6 @@ class MusicPlayerController(object):
 
     self.updateStationList()
     self.play(0)
-
   
   '''
   Playback
@@ -59,12 +58,11 @@ class MusicPlayerController(object):
     print 'retrieved volume: ' + str(status['volume'])
     return int(status['volume'])
 
+  def getNumberOfStations(self):
+    return self.numberOfStations
 
-    # if not status and not status['volume']:
-    #   return self.lastKnownVolume
-
-    # self.lastKnownVolume = int(status['volume'])
-    # return self.lastKnownVolume
+  def getCurrentStation(self):
+    return self.getCurrentStation
 
   def increaseVolume(self):
     curVol = self.getVolume()

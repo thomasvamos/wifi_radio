@@ -1,5 +1,5 @@
 from abstract_mode import AbstractMode
-from menu_mode import MenuMode
+from mode_constants import ModeConstants
 
 class PlaybackMode(AbstractMode):
 
@@ -41,4 +41,4 @@ class PlaybackMode(AbstractMode):
     self.lcd.printPause()
 
   def handleMenuPress(self):
-    self.switchMode(MenuMode.__name__)
+    self.switchMode(ModeConstants.MODE_STATIONS)

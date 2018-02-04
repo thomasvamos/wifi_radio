@@ -1,37 +1,37 @@
 from abstract_mode import AbstractMode
 from mode_constants import ModeConstants
 
-class MenuMode(AbstractMode):
+class StationsMode(AbstractMode):
 
   def __init__(self, lcd, mpc, funcSwitchMode):
-    super(MenuMode,self).__init__(lcd, mpc, funcSwitchMode) 
+    super(StationsMode,self).__init__(lcd, mpc, funcSwitchMode) 
 
   def getName(self):
-    return 'MenuMode'
+    return 'StationsMode'
 
   def tick(self):
     self.lcd.printMenu()
 
   def handleMenuLeftTurn(self):
-    print "MenuMode: Menu left turn"
+    print "StationsMode: Menu left turn"
     pass
   
   def handleMenuRightTurn(self):
-    print "MenuMode: Menu right turn"
+    print "StationsMode: Menu right turn"
     pass
   
   def handleMenuPress(self):
-    print "MenuMode: Menu press"
+    print "StationsMode: Menu press"
     self.switchMode(ModeConstants.MODE_PLAYBACK)
 
   def handleVolumeLeftTurn(self):
-    print "MenuMode: Volume left turn"
+    print "StationsMode: Volume left turn"
     pass
 
   def handleVolumeRightTurn(self):
-    print "MenuMode: Volume right turn"
+    print "StationsMode: Volume right turn"
     pass
 
   def handleVolumePress(self):
-    print "MenuMode: Volume press"
+    print "StationsMode: Volume press"
     pass
