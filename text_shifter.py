@@ -2,7 +2,7 @@
 
 class TextShifter(object):
 
-  def __init__(self, colums):
+  def __init__(self, columns):
      self.shiftIdx = 0
      self.cols = columns
 
@@ -10,8 +10,9 @@ class TextShifter(object):
     self.shiftIdx = 0
 
   def shiftText(self, text):
+      self.shiftIdx += 1
       startIdx = self.shiftIdx % len(text)
-      endIdx = (self.shiftIdx + LCDPrintUtil.cols) % len(text)
+      endIdx = (self.shiftIdx + self.cols) % len(text)
       if startIdx < endIdx:
         return text[startIdx:endIdx]
       else:

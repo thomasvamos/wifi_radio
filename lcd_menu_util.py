@@ -2,18 +2,20 @@
 
 # credit: https://github.com/aufder/RaspberryPiLcdMenu/blob/master/lcdmenu.py
 
+from text_shifter import TextShifter
+
 class LcdMenuUtil(object):
 
   U_ARROW = '>'
-  cols = 20
-  rows = 4
-  
   currentTopItem = 0
   currentSelectedItem = 0
 
   displayContent = ""
 
-  def __init__(self, entries):
+  def __init__(self, cols, rows, entries):
+    self.cols = cols
+    self.rows = rows
+    self.textShifter = TextShifter(self.cols)
     self.menu_entries = entries
 
 
@@ -31,6 +33,8 @@ class LcdMenuUtil(object):
 
 
   def up(self):
+    self.textShifter.resetShiftIndex()
+
     if self.currentSelectedItem == 0:
       return
     elif self.currentSelectedItem > self.currentTopItem:
@@ -41,6 +45,8 @@ class LcdMenuUtil(object):
 
 
   def down(self):
+    self.textShifter.resetShiftIndex()
+
     if self.currentSelectedItem + 1 == len(self.menu_entries):
       return
     elif self.currentSelectedItem < self.currentTopItem + self.rows-1:
@@ -57,11 +63,13 @@ class LcdMenuUtil(object):
   def getMenuItemString(self, item, selected):
     prefix = self.U_ARROW if selected else ' '
 
-    if(len(item) > LcdMenuUtil.cols):
-      item = prefix + item[:16] + '...'
+    if(len(item) > self.cols):
+      if selected:
+        item = self.textShifter.shiftText(item)
+      item = prefix + item[:19]
 
-    if(len(item) < LcdMenuUtil.cols):
-      item = (prefix + item).ljust(LcdMenuUtil.cols)
+    if(len(item) < self.cols):
+      item = (prefix + item).ljust(self.cols)
 
     return item
 

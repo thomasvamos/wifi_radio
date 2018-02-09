@@ -7,7 +7,8 @@ class StationsMode(AbstractMode):
   def __init__(self, lcd, mpc, funcSwitchMode):
     super(StationsMode,self).__init__(lcd, mpc, funcSwitchMode)
     self.stations = self.mpc.getSongsInCurrentPlaylist()
-    self.lcdMenuUtil = LcdMenuUtil(self.stations)
+    self.lcdMenuUtil = LcdMenuUtil(lcd.cols, lcd.rows, self.stations)
+
 
   def tick(self):
     menu = self.lcdMenuUtil.getMenuAsString()
