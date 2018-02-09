@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from mode.mode_selector import ModeSelector
+from mode_selector import ModeSelector
 
 class RadioController(object):
 

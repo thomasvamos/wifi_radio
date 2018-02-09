@@ -1,27 +1,27 @@
 from abstract_mode import AbstractMode
 from mode_constants import ModeConstants
+from lcd_menu_util import LcdMenuUtil
 
 class StationsMode(AbstractMode):
 
   def __init__(self, lcd, mpc, funcSwitchMode):
-    super(StationsMode,self).__init__(lcd, mpc, funcSwitchMode) 
-
-  def getName(self):
-    return 'StationsMode'
+    super(StationsMode,self).__init__(lcd, mpc, funcSwitchMode)
+    self.stations = self.mpc.getSongsInCurrentPlaylist()
+    self.lcdMenuUtil = LcdMenuUtil(self.stations)
 
   def tick(self):
-    self.lcd.printMenu()
+    menu = self.lcdMenuUtil.getMenuAsString()
+    self.lcd.printRaw(menu)
 
   def handleMenuLeftTurn(self):
-    print "StationsMode: Menu left turn"
-    pass
+    self.lcdMenuUtil.up()
   
   def handleMenuRightTurn(self):
-    print "StationsMode: Menu right turn"
-    pass
+    self.lcdMenuUtil.down()
   
   def handleMenuPress(self):
-    print "StationsMode: Menu press"
+    idx = self.lcdMenuUtil.getSelectedIndex()
+    self.mpc.play(int(self.stations[idx]['pos']))
     self.switchMode(ModeConstants.MODE_PLAYBACK)
 
   def handleVolumeLeftTurn(self):

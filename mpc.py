@@ -37,11 +37,31 @@ class MusicPlayerController(object):
   '''
   Playback
   '''
-  def play(self, entry=0):
-    print 'Playing entry: ' + str(entry)
+  def play(self, pos=0):
+    if pos < 0 or pos > self.numberOfStations:
+      print "station to play is not in range."
+      return
+
     with self.client:
-      self.client.play(entry)
-    print 'Set station to entry' + str(entry)
+      self.client.play(pos)
+
+    self.currentsong = pos
+
+  def playNextStation(self):
+    if(self.currentStation+1 >= self.numberOfStations):
+      self.currentStation = 0
+    else:
+      self.currentStation += 1
+    
+    self.play(self.currentStation)
+
+  def playPreviousStation(self):
+    if(self.currentStation -1 < 0):
+      self.currentStation = self.numberOfStations-1
+    else:
+      self.currentStation -=1
+ 
+    self.play(self.currentStation)
 
   def stop(self):
     with self.client:
@@ -57,6 +77,10 @@ class MusicPlayerController(object):
       status = self.client.status()
     print 'retrieved volume: ' + str(status['volume'])
     return int(status['volume'])
+
+  def getSongsInCurrentPlaylist(self):
+    with self.client:
+      return self.client.playlistinfo()
 
   def getNumberOfStations(self):
     return self.numberOfStations
@@ -81,22 +105,6 @@ class MusicPlayerController(object):
 
     with self.client:
       self.client.setvol(curVol - 1)
-
-  def playNextStation(self):
-    if(self.currentStation+1 >= self.numberOfStations):
-      self.currentStation = 0
-    else:
-      self.currentStation += 1
-    
-    self.play(self.currentStation)
-
-  def playPreviousStation(self):
-    if(self.currentStation -1 < 0):
-      self.currentStation = self.numberOfStations-1
-    else:
-      self.currentStation -=1
- 
-    self.play(self.currentStation)
 
   def getCurrentSongInfo(self):
     try:

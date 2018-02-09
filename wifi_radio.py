@@ -51,6 +51,7 @@ class WifiRadio(object):
                 self.radioController.tick()
 
         except KeyboardInterrupt:
+            GPIO.cleanup()
             ser.close()
 
     def initLogger(self):

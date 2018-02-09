@@ -66,8 +66,9 @@ class LCDPrintUtil(object):
     self.printScreen(self.displayContent)
 
     
-  def printStationList(self, stations, index):
-    self.displayContent = "Station List"
+  def printRaw(self, content):
+    self.displayContent = content
+    self.printScreen(self.displayContent)
 
   def printVolumeUp(self):
     self.displayContent = LCDPrintUtil.volumeUpMsg

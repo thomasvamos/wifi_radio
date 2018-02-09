@@ -2,7 +2,7 @@
 #
 # Raspberry Pi Wifi Radio
 # 
-# Author : Thomas Pieronczyk
+# Author : Thomas Vamos
 # Site   : http://www.impierium.de
 # 
 # Date   : 14.09.2014
@@ -177,6 +177,11 @@ class CharLCD(object):
 
 if __name__ == '__main__':
   lcd = CharLCD()
+
+  lcd.writeMessageToLine("Special chars",1)
+  lcd.writeByte(0b00010000)
+  sleep(3)
+  lcd.clear()
   lcd.writeMessage("This is a short message")  
   sleep(3)  
   lcd.clear()
