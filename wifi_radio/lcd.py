@@ -1,16 +1,8 @@
-#!/usr/bin/python
-#
-# Raspberry Pi Wifi Radio
-# 
-# Author : Thomas Vamos
-# Site   : http://www.impierium.de
-# 
-# Date   : 14.09.2014
-#
-# Based on code from the following resources:
-# Matt Hawkins: http://www.raspberrypi-spy.co.uk/2012/07/16x2-lcd-module-control-using-python/
-# Adafruit: https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code/blob/master/Adafruit_CharLCD/Adafruit_CharLCD.py
-#
+#!/usr/bin/env python
+
+'''
+LCD Control code
+'''
 
 # LCD Pin functions
 # 1 : GND
@@ -30,7 +22,6 @@
 # 15: LCD Backlight +5V**
 # 16: LCD Backlight GND
 
-#import
 import RPi.GPIO as GPIO
 from time import sleep
 

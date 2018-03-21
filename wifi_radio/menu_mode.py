@@ -1,3 +1,6 @@
+'''
+Mode for additional menu items
+'''
 from abstract_mode import AbstractMode
 from mode_constants import ModeConstants
 

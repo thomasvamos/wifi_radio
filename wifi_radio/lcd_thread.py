@@ -1,3 +1,7 @@
+'''
+Thread to decouple LCD control from the main thread
+'''
+
 import threading
 from time import sleep
 from wifi_radio_constants import WifiRadioConstants as WRC

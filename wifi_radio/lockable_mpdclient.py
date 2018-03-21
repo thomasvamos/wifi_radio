@@ -1,3 +1,7 @@
+'''
+Wrapper for a lockable MPD client
+'''
+
 from threading import Lock, Thread
 from random import choice
 from mpd import MPDClient

@@ -1,4 +1,6 @@
-#!/usr/bin/python
+'''
+Delegates inputs to active mode
+'''
 
 from mode_selector import ModeSelector
 

@@ -1,4 +1,6 @@
-#!/usr/bin/python
+'''
+Constants for GPIO pins and message indicators
+'''
 
 class WifiRadioConstants(object):
 

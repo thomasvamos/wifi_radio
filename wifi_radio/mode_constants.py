@@ -1,4 +1,6 @@
-#!/usr/bin/python
+'''
+Mode names to share between scripts
+'''
 
 class ModeConstants(object):
   MODE_PLAYBACK = 'playback'

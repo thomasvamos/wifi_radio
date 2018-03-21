@@ -1,13 +1,7 @@
-#!/usr/bin/python
-#
-# MPD Utility Class
-# 
-# Author : Thomas Pieronczyk
-# Site   : http://www.impierium.de
-# 
-# Date   : 14.09.2014
-#
-# Based on code from the following resources:
+'''
+MPD Utility Class
+'''
+
 import subprocess
 import mpd
 from mpd import ConnectionError

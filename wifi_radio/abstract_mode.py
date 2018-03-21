@@ -1,3 +1,7 @@
+'''
+Base class for operation modes
+'''
+
 from abc import ABCMeta, abstractmethod
 from mpc import MusicPlayerController
 import os
@@ -43,7 +47,7 @@ class AbstractMode:
     pass
 
   def handleShutdown(self):
+    self.mpc.stop()
     self.lcd.printGoodbye()
     sleep(1)
-    self.mpc.stop()
     os.system("sudo shutdown -h now")

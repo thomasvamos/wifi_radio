@@ -1,15 +1,9 @@
 #!/usr/bin/env python
-#
-# Raspberry Pi Wifi Radio
-# 
-# Author : Thomas Vamos
-# Site   : impierium.de
-# 
-# Date   : 14.09.2014
-#
-# Based on code from the following resources:
-# Matt Hawkins: http://www.raspberrypi-spy.co.uk/2012/08/20x4-lcd-module-control-using-python/
-# http://usualpanic.com/2013/05/raspberry-pi-internet-radio/
+'''
+Raspberry Pi Wifi Radio
+
+Created: 14.09.2014
+'''
 
 import RPi.GPIO as GPIO
 from wifi_radio_constants import WifiRadioConstants as WRC
@@ -20,6 +14,12 @@ import signal
 import serial
 import logging
 import configuration as cfg
+
+__author__ = "Thomas Vamos"
+__license__ = "MIT"
+__version__ = "0.0.1"
+__maintainer__ = "Thomas Vamos"
+__email__ = "mail@thomasvamos.de"
 
 class WifiRadio(object):
 
@@ -103,4 +103,5 @@ class WifiRadio(object):
         # print "Shutdown..."
         self.radioController.handleShutdown()
 
-WifiRadio()
+if __name__ == '__main__':
+    WifiRadio()

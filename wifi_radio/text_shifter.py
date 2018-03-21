@@ -1,4 +1,6 @@
-#!/usr/bin/python
+'''
+Utility class to shift text for the lcd display
+'''
 
 class TextShifter(object):
 

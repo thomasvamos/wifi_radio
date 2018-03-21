@@ -1,4 +1,6 @@
-#!/usr/bin/python
+'''
+Utility class to switch between operation modes
+'''
 
 from playback_mode import PlaybackMode
 from menu_mode import MenuMode

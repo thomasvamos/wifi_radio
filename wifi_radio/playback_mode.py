@@ -1,3 +1,7 @@
+'''
+Mode for playback actions
+'''
+
 from abstract_mode import AbstractMode
 from mode_constants import ModeConstants
 

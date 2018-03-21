@@ -1,3 +1,7 @@
+'''
+Mode to select a radio station
+'''
+
 from abstract_mode import AbstractMode
 from mode_constants import ModeConstants
 from lcd_menu_util import LcdMenuUtil

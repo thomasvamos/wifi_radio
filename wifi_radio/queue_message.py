@@ -1,7 +1,8 @@
+'''
+Rotary encoder message DTO for the queue
+'''
+
 class Message(object):
-	'''
-	Rotary encoder message DTO for the queue
-	'''
 
 	CCW = "counterclockwise"
 	CW = "clockwise"

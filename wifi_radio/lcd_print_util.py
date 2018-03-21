@@ -1,4 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+
+'''
+LCD Utility class with pre defined LCD message layouts
+'''
+
 from time import sleep
 from date_time_util import DateTimeUtil
 from lcd_thread import LCDThread

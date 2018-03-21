@@ -1,6 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
-# credit: https://github.com/aufder/RaspberryPiLcdMenu/blob/master/lcdmenu.py
+'''
+LCD Utility class with pre defined LCD message layouts for the station selector menu
+'''
+
 
 from text_shifter import TextShifter
 
@@ -72,8 +75,6 @@ class LcdMenuUtil(object):
       item = (prefix + item).ljust(self.cols)
 
     return item
-
-
 
 if __name__ == '__main__':
 
