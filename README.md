@@ -22,6 +22,11 @@ The following schematic shows, how the hardware is tied together:
 ### Installation
 TODO
 
+### Running the tests
+To run the tests simply navigate to the root of the project and run:
+
+    $> python -m unittest discover
+
 # Acknowledgments
 * Inspiration
   * [Sheldon Hartling](http://usualpanic.com/2013/05/raspberry-pi-internet-radio/)
