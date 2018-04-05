@@ -12,6 +12,10 @@
 
   # pip install RPi.GPIO pyserial python-mpd2
 
+# set correct timezone
+sudo echo "Europe/Berlin" > /etc/timezone
+sudo dpkg-reconfigure tzdata
+
 # setup serial communication
 
 # configure usb soundcard

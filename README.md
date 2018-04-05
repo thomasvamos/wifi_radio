@@ -41,6 +41,18 @@ To run the tests simply navigate to the root of the project and run:
 
 # Remove
 
+# install package to systemd
+## Tutorials
+https://weblog.christoph-egger.org/Installing_a_python_systemd_service_.html
+https://learn.adafruit.com/running-programs-automatically-on-your-tiny-computer/systemd-writing-and-enabling-a-service
+
+## Projects with init scripts
+* https://github.com/python-diamond/Diamond/blob/master/setup.py
+* https://github.com/liftoff/GateOne/blob/master/setup.py
+
+## Debian packaging
+https://wiki.debian.org/Python/LibraryStyleGuide
+
 - RPi.GPIO
 - pyserial
 - mpd
