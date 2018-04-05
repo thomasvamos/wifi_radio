@@ -6,7 +6,7 @@ After=network.target multi-user.target
 Type=idle
 User=root
 PIDFile=/tmp/wifi_radio.pid
-ExecStart=/usr/bin/python /usr/local/lib/python2.7/dist-packages/wifi_radio/wifi_radio.py
+ExecStart=/usr/bin/python /usr/local/bin/wifi_radio
 
 [Install]
 WantedBy=multi-user.target

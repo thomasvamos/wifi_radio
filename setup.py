@@ -5,6 +5,7 @@ from setuptools.command.install import install
 
 import platform
 import os
+import subprocess
 
 data_files = [
         ('share/wifi_radio', ['LICENSE.md', 'LICENSE.md'])
@@ -12,14 +13,19 @@ data_files = [
 
 class InstallSteps(install):
 
+  def execute_command(self, command):
+    try:
+        try:
+            path = subprocess.getoutput(command)
+        except AttributeError:
+            path = subprocess.check_output(command, stderr=subprocess.STDOUT)
+        return path.strip()
+    except (subprocess.CalledProcessError, OSError):
+        return "/lib/systemd/system"
+
   def run(self):
 
     global data_files
-
-    print "=== OS NAME: " + os.name 
-    print "=== DISTRO : " + platform.dist()[0]
-    print "=== MAJRVR : " + platform.dist()[1].split('.')[0]
-
 
     if os.name == 'nt':
       pass
@@ -29,12 +35,11 @@ class InstallSteps(install):
 
       if distro == 'debian' and distro_major_version >= 7:
         data_files.append(('/usr/lib/systemd/system',
-                          ['install/wifi_radio.service']))
+                          ['scripts/systemd/wifi_radio.service']))
 
     install.run(self)
-    
-
-
+    self.execute_command(["systemctl", "enable", "wifi_radio"])
+    self.execute_command(["systemctl", "start", "wifi_radio"])
 
 setup(name='wifi-radio',
       version='0.1',
