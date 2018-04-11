@@ -58,7 +58,9 @@ setup(name='wifi-radio',
       packages=['wifi_radio'],
       data_files=data_files,
       install_requires=[
-          'RPi.GPIO',
+          'RPi.GPIO==0.6.3',
+          'python-mpd==0.3.0',
+          'pyserial==3.4'
       ],
        # this will create the /usr/local/bin/wifi_radio entrypoint script
       entry_points={
