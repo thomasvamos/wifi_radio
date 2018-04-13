@@ -44,7 +44,7 @@ class InstallSteps(install):
 setup(name='wifi-radio',
       version='0.1',
       description='A wifi radio for raspberry pi',
-      url='http://github.com/th0m4d/wifi-radio',
+      url='http://github.com/thomasvamos/wifi-radio',
       author='Thomas Vamos',
       author_email='mail@thomasvamos.de',
       classifiers=[  
