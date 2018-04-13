@@ -20,7 +20,14 @@ The following schematic shows, how the hardware is tied together:
 ![Radio schematic](docs/Wifi_Radio_Wiring_Steckplatine.jpg?raw=true "Radio schematic")
 
 ### Installation
-TODO
+
+#### Prepare OS
+* [Configure Wifi](https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md)
+* [Enable SSH](https://www.raspberrypi.org/documentation/remote-access/ssh/)
+
+#### Install Project
+
+    $> pip install wifi_radio
 
 ### Running the tests
 To run the tests simply navigate to the root of the project and run:
@@ -94,3 +101,6 @@ http://www.susa.net/wordpress/2012/06/raspberry-pi-relay-using-gpio/
 
 Relay Shutoff Delay
 http://www.rbg.ul.schule-bw.de/elektronik/ausschaltverzoegerung.htm
+
+## Using virtualenv
+http://docs.python-guide.org/en/latest/dev/virtualenvs/
