@@ -10,9 +10,11 @@ You will need the following hardware if you want to rebuilt this radio as it is:
 * 2 x push-button rotary encoders
 * 1 x 5V/3.3V Logic Level Converter
 * 1 x PAM8403 3W Amplifier
-* 1 x USB Soundcard (optional)
+* 2 x 3 Ohm Speakers
 * 1 x wifi dongle
 * 1 x 25 Watt power source
+* 1 x USB Soundcard (optional)
+* Cables and passive components
 
 The hardware used in the current setup is not optimal, as the project started with some components I had laying around and grew over time. Feel free to change it to your taste.
 
